@@ -18,12 +18,3 @@ document.getElementsByTagName("body")[0].setAttribute("text", "black");
 document.getElementsByTagName("body")[0].setAttribute("alink", "blue");
 document.getElementsByTagName("body")[0].setAttribute("link", "blue");
 document.getElementsByTagName("body")[0].setAttribute("vlink", "blue");
-
-var myElements = document.querySelectorAll('*');
-var siteStyle;
-for (var i = 0; i < myElements.length; i++) {
-  siteStyle = window.getComputedStyle(myElements[i]);
-  if (siteStyle.getPropertyValue('background-image').match(/url\(/)) {
-    myElements[i].style.setProperty("-webkit-filter","invert(100%)","");
-  }
-}
