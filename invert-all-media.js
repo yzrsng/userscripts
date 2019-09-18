@@ -51,7 +51,7 @@
 
   // invertRootElms(myElms);
 
-  var id = setInterval(function(){
+  var id = setTimeout(function(){
     invertRootElms(myElms);
-  }, 500);
+  }, 1000);
 })();
