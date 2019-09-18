@@ -12,7 +12,7 @@
 (function() {
   'use strict';
 
-  var css = document.createElement('style');
+  let css = document.createElement('style');
   css.type = "text/css";
   css.innerHTML = 'iframe[src*="embed"]:not(.invertedChildren-yz),iframe[data-src*="embed"]:not(.invertedChildren-yz),img:not(.invertedChildren-yz),video:not(.invertedChildren-yz),canvas:not(.invertedChildren-yz),.invertedRoot-yz{-webkit-filter:invert(100%)}';
   document.getElementsByTagName('head')[0].appendChild(css);
