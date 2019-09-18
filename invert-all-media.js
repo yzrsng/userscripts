@@ -48,10 +48,9 @@
   }
   
   let myElms = document.getElementsByTagName('*');
-
   // invertRootElms(myElms);
 
-  var id = setTimeout(function(){
+  let id = setTimeout(function(){
     invertRootElms(myElms);
   }, 1000);
 })();
