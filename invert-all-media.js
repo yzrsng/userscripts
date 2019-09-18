@@ -38,6 +38,10 @@
         continue;
       }
       elms[i].classList.add('patrolled-yz');
+      if (elms[i].parentNode.classList.contains('invertedChildren-yz')) {
+        markChildElms(elms[i].children);
+        continue;
+      }
       ssStyle = window.getComputedStyle(elms[i]);
       if (elms[i].tagName === 'IMG' || elms[i].tagName === 'VIDEO' || elms[i].tagName === 'CANVAS' || ssStyle.getPropertyValue('background-image').match(/url\(/)) {
         elms[i].classList.add('invertedRoot-yz');
