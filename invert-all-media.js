@@ -2,7 +2,7 @@
 // @name Invert All Media Script
 // @namespace Violentmonkey Scripts
 // @author yzrsng
-// @description Userscript for Invert Rendering by Yuzu Browser.
+// @description Userscript for Invert Rendering.
 // @version 0.1
 // @include *
 // @match *://*/*
