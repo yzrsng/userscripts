@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name Invert All Image Script
+// @name Invert All Media Script
 // @namespace Violentmonkey Scripts
 // @author yzrsng
 // @description Userscript for Invert Rendering by Yuzu Browser.
