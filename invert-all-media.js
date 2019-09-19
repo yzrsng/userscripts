@@ -2,7 +2,7 @@
 // @name Invert All Media Script
 // @namespace Violentmonkey Scripts
 // @author yzrsng
-// @description Userscript for Invert Rendering.
+// @description Userscript for Invert Rendering. 疑似要素以外の要素の背景画像を含むメディアを反転させるスクリプト。
 // @version 0.1
 // @include *
 // @match *://*/*
