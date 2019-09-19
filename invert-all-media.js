@@ -22,6 +22,19 @@
   //   console.log(elms.length);
   // }
 
+  function judgeBgClr(clrValues) {
+    for (let i = 0; i < clrValues.length; i++) {
+      clrValues[i] = parseInt(clrValues[i],10);
+    }
+    let judgePoint = clrValues[0]*9 + clrValues[1]*13 + clrValues[2]*8;
+    console.log(clrValues + " values");
+    console.log(judgePoint + " judge");
+    if (judgePoint < 3830) {
+      return "255, 255, 255";
+    }
+    return "0, 0, 0";
+  }
+
   function markChildElms(elms) {
     for (let i = 0; i < elms.length; i++) {
       elms[i].classList.add('patrolled-yz');
@@ -31,7 +44,6 @@
   }
 
   function invertRootElms(elms) {
-    // console.log(elms.length);
     let ssStyle;
     for (let i = 0; i < elms.length; i++) {
       if (elms[i].classList.contains('patrolled-yz')) {
@@ -39,11 +51,19 @@
       }
       elms[i].classList.add('patrolled-yz');
       if (elms[i].parentNode.classList.contains('invertedChildren-yz')) {
+        elms[i].classList.add('invertedChildren-yz');
         markChildElms(elms[i].children);
         continue;
       }
       ssStyle = window.getComputedStyle(elms[i]);
       if (elms[i].tagName === 'IMG' || elms[i].tagName === 'VIDEO' || elms[i].tagName === 'CANVAS' || ssStyle.getPropertyValue('background-image').match(/url\(/)) {
+        if (ssStyle.getPropertyValue('background-repeat').match(/-/) || ssStyle.getPropertyValue('background-repeat').match(/space/)) {
+          let bgColorValue = ssStyle.getPropertyValue('color');
+          bgColorValue = bgColorValue.substring(4,bgColorValue.length-1);
+          let clrAry = bgColorValue.split(', ');
+          bgColorValue = judgeBgClr(clrAry);
+          elms[i].style.setProperty("background-color","rgba(" + bgColorValue + ", 0.75" + ")","");
+        }
         elms[i].classList.add('invertedRoot-yz');
         elms[i].style.setProperty("-webkit-filter","invert(100%)","");
         markChildElms(elms[i].children);
