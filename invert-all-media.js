@@ -37,7 +37,7 @@
 
   function markChildElms(elms) {
     for (let i = 0; i < elms.length; i++) {
-      elms[i].classList.add('patrolled-yz');
+      elms[i].classList.add('invertPatrolled-yz');
       elms[i].classList.add('invertedChildren-yz');
       markChildElms(elms[i].children);
     }
@@ -46,10 +46,10 @@
   function invertRootElms(elms) {
     let ssStyle;
     for (let i = 0; i < elms.length; i++) {
-      if (elms[i].classList.contains('patrolled-yz')) {
+      if (elms[i].classList.contains('invertPatrolled-yz')) {
         continue;
       }
-      elms[i].classList.add('patrolled-yz');
+      elms[i].classList.add('invertPatrolled-yz');
       if (elms[i].parentNode.classList.contains('invertedChildren-yz')) {
         elms[i].classList.add('invertedChildren-yz');
         markChildElms(elms[i].children);
