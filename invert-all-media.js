@@ -2,7 +2,7 @@
 // @name Invert All Media Script
 // @namespace Violentmonkey Scripts
 // @author yzrsng
-// @description Userscript for Invert Rendering. 疑似要素以外の要素の背景画像を含むメディアを反転させるスクリプト。
+// @description Userscript for Invert Rendering. 背景画像を含むメディアを反転させるスクリプト。
 // @version 0.1
 // @include *
 // @match *://*/*
@@ -44,7 +44,6 @@
   }
 
   function invertRootElms(elms) {
-    let ssStyle;
     for (let i = 0; i < elms.length; i++) {
       if (elms[i].classList.contains('invertPatrolled-yz')) {
         continue;
@@ -55,8 +54,10 @@
         markChildElms(elms[i].children);
         continue;
       }
-      ssStyle = window.getComputedStyle(elms[i]);
-      if (elms[i].tagName === 'IMG' || elms[i].tagName === 'VIDEO' || elms[i].tagName === 'CANVAS' || ssStyle.getPropertyValue('background-image').match(/url\(/)) {
+      let ssStyle = window.getComputedStyle(elms[i]);
+      let ssStyleBefore = window.getComputedStyle(elms[i], '::before');
+      let ssStyleAfter = window.getComputedStyle(elms[i], '::after');
+      if (elms[i].tagName === 'IMG' || elms[i].tagName === 'VIDEO' || elms[i].tagName === 'CANVAS' || ssStyle.getPropertyValue('background-image').match(/url\(/) || ssStyleBefore.getPropertyValue('background-image').match(/url\(/) || ssStyleAfter.getPropertyValue('background-image').match(/url\(/)) {
         if (ssStyle.getPropertyValue('background-repeat').match(/-/) || ssStyle.getPropertyValue('background-repeat').match(/space/)) {
           let bgColorValue = ssStyle.getPropertyValue('color');
           bgColorValue = bgColorValue.substring(4,bgColorValue.length-1);
