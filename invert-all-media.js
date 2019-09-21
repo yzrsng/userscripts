@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name Invert All Media Script
+// @name Dynamic Invert All Media Script
 // @namespace Violentmonkey Scripts
 // @author yzrsng
 // @description Userscript for Invert Rendering. 背景画像を含むメディアを反転させるスクリプト。
@@ -20,11 +20,19 @@
     yuzubrowserInvertModeStyle.parentNode.removeChild(yuzubrowserInvertModeStyle);
   }
 
-  const css = document.createElement('style');
-  css.type = "text/css";
-  css.id = 'dynamic_invert_media_filter';
-  css.innerHTML = 'iframe[src*="embed"]:not(.invertedChildren-yz),iframe[data-src*="embed"]:not(.invertedChildren-yz),img:not(.invertedChildren-yz),video:not(.invertedChildren-yz),canvas:not(.invertedChildren-yz),.invertedRoot-yz{filter:invert(100%)}';
-  document.getElementsByTagName('head')[0].appendChild(css);
+  const patrolledClass = "invertPatrolledElement-yz";
+  const InvertClassRoot = "invertedRootElement-yz";
+  const InvertClassChild = "invertedChildElement-yz";
+  const myCss = document.createElement('style');
+  myCss.type = "text/css";
+  myCss.id = 'dynamic_invert_media_filter';
+  myCss.insertAdjacentHTML('beforeend', 'iframe[src*="embed"]:not(.' + InvertClassChild + '),');
+  myCss.insertAdjacentHTML('beforeend', 'iframe[data-src*="embed"]:not(.' + InvertClassChild + '),');
+  myCss.insertAdjacentHTML('beforeend', 'img:not(.' + InvertClassChild + '),');
+  myCss.insertAdjacentHTML('beforeend', 'video:not(.' + InvertClassChild + '),');
+  myCss.insertAdjacentHTML('beforeend', 'canvas:not(.' + InvertClassChild + '),');
+  myCss.insertAdjacentHTML('beforeend', '.' + InvertClassRoot + '{filter:invert(100%)}');
+  document.getElementsByTagName('head')[0].appendChild(myCss);
   
   // function printElms(elms) {
   //   console.log(elms);
@@ -47,7 +55,10 @@
     return "rgba(0, 0, 0, 0.75)";
   }
 
+  let grantBgColorCount = 0;
   function returnParentsBgColor(elm) {
+    console.log("grantBgColorCount: "+ ++grantBgColorCount);
+    myCss.insertAdjacentHTML('beforeend', "");
     const elmStyle = window.getComputedStyle(elm);
     const elmBgColor = elmStyle.getPropertyValue("background-color");
     if (elmBgColor === "rgba(0, 0, 0, 0)") {
@@ -61,8 +72,8 @@
 
   function markChildElms(elms) {
     for (let i = 0; i < elms.length; i++) {
-      elms[i].classList.add('invertPatrolled-yz');
-      elms[i].classList.add('invertedChildren-yz');
+      elms[i].classList.add(patrolledClass);
+      elms[i].classList.add(InvertClassChild);
       markChildElms(elms[i].children);
     }
   }
@@ -72,13 +83,13 @@
       elms[0].style.setProperty("background-color", "rgb(255, 255, 255)", "");
     }
     for (let i = 0; i < elms.length; i++) {
-      if (elms[i].classList.contains('invertPatrolled-yz')) {
+      if (elms[i].classList.contains(patrolledClass)) {
         continue;
       }
-      elms[i].classList.add('invertPatrolled-yz');
+      elms[i].classList.add(patrolledClass);
       if (elms[i].tagName !== "HTML") {
-        if (elms[i].parentNode.classList.contains('invertedChildren-yz')) {
-          elms[i].classList.add('invertedChildren-yz');
+        if (elms[i].parentNode.classList.contains(InvertClassChild)) {
+          elms[i].classList.add(InvertClassChild);
           markChildElms(elms[i].children);
           continue;
         }
@@ -95,7 +106,7 @@
           // elms[i].style.setProperty("background-color", returnJudgeBgColor(elms[i]), "");
           elms[i].style.setProperty("background-color", returnParentsBgColor(elms[i]), "");
         }
-        elms[i].classList.add('invertedRoot-yz');
+        elms[i].classList.add(InvertClassRoot);
         elms[i].style.setProperty("filter","invert(100%)","");
         if (elms[i].children.length === 0) {
           continue;
