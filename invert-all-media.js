@@ -11,9 +11,18 @@
 
 (function() {
   'use strict';
+  
+  // remove build in filter for Invert mode on Yuzu Browser
+  const yuzubrowserInvertModeStyle = document.getElementById('yuzubrowser_invert_mode');
+  console.log(yuzubrowserInvertModeStyle);
+  console.log(typeof yuzubrowserInvertModeStyle);
+  if (yuzubrowserInvertModeStyle !== null) {
+    yuzubrowserInvertModeStyle.parentNode.removeChild(yuzubrowserInvertModeStyle);
+  }
 
   const css = document.createElement('style');
   css.type = "text/css";
+  css.id = 'dynamic_invert_media_filter';
   css.innerHTML = 'iframe[src*="embed"]:not(.invertedChildren-yz),iframe[data-src*="embed"]:not(.invertedChildren-yz),img:not(.invertedChildren-yz),video:not(.invertedChildren-yz),canvas:not(.invertedChildren-yz),.invertedRoot-yz{filter:invert(100%)}';
   document.getElementsByTagName('head')[0].appendChild(css);
   
