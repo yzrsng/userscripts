@@ -22,14 +22,12 @@ document.getElementsByTagName("body")[0].setAttribute("alink", "red");
 document.getElementsByTagName("body")[0].setAttribute("link", "red");
 document.getElementsByTagName("body")[0].setAttribute("vlink", "red");
 
-var twElements = document.querySelectorAll('body *');
-var ssStyle;
+const twElements = document.getElementsByTagName('*');
 for (let i = 0; i < twElements.length; i++) {
-  ssStyle = window.getComputedStyle(twElements[i]);
   // 多重反転を防ぐために小要素を持たない要素のみ
   if (twElements[i].childElementCount === 0) {
     // 背景画像を設定している要素のみを反転
-    if (ssStyle.getPropertyValue('background-image').match(/url\(/)) {
+    if (window.getComputedStyle(twElements[i]).getPropertyValue('background-image').match(/url\(/)) {
       twElements[i].style.setProperty("-webkit-filter","invert(100%)","");
     }
   }
