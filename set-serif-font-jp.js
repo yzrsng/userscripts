@@ -16,7 +16,7 @@
   myLink.id = 'set_serif_font_link';
   myLink.setAttribute("rel", "stylesheet");
   myLink.setAttribute("href", "https://fonts.googleapis.com/css?family=Noto+Serif+JP|Sawarabi+Mincho&display=swap");
-  document.getElementsByTagName('head')[0].appendChild(link);
+  document.getElementsByTagName('head')[0].appendChild(myLink);
 
   const myCss = document.createElement('style');
   myCss.type = "text/css";
