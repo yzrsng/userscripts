@@ -28,7 +28,6 @@
   myCss.insertAdjacentHTML('beforeend', 'iframe[data-src*="embed"]:not(.' + invertClassChild + '),');
   myCss.insertAdjacentHTML('beforeend', 'img:not(.' + invertClassChild + '),');
   myCss.insertAdjacentHTML('beforeend', 'embed:not(.' + invertClassChild + '),');
-  myCss.insertAdjacentHTML('beforeend', 'svg:not(.' + invertClassChild + '),');
   myCss.insertAdjacentHTML('beforeend', 'video:not(.' + invertClassChild + '),');
   myCss.insertAdjacentHTML('beforeend', 'canvas:not(.' + invertClassChild + '),');
   myCss.insertAdjacentHTML('beforeend', '.' + invertClassRoot + '{filter:invert(100%)}');
@@ -104,7 +103,7 @@
       const ssStyle = window.getComputedStyle(elms[i]);
       const ssStyleBefore = window.getComputedStyle(elms[i], '::before');
       const ssStyleAfter = window.getComputedStyle(elms[i], '::after');
-      if (ssStyle.getPropertyValue('background-image').match(/url\(/) || ssStyleBefore.getPropertyValue('background-image').match(/url\(/) || ssStyleAfter.getPropertyValue('background-image').match(/url\(/) || elms[i].tagName === 'IMG' || elms[i].tagName === 'EMBED' || elms[i].tagName === 'SVG' || elms[i].tagName === 'VIDEO' || elms[i].tagName === 'CANVAS') {
+      if (ssStyle.getPropertyValue('background-image').match(/url\(/) || ssStyleBefore.getPropertyValue('background-image').match(/url\(/) || ssStyleAfter.getPropertyValue('background-image').match(/url\(/) || elms[i].tagName === 'IMG' || elms[i].tagName === 'EMBED' || elms[i].tagName === 'VIDEO' || elms[i].tagName === 'CANVAS') {
         // if (ssStyle.getPropertyValue('background-repeat').match(/-/) || ssStyle.getPropertyValue('background-repeat').match(/space/)) {
         //   // judgeBgColor(elms[i]);
         //   elms[i].classList.add(grantedBgColorClass + grantBgColorCount);
