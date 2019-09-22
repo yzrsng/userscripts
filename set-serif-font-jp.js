@@ -4,8 +4,8 @@
 // @author yzrsng
 // @description Userscript for Serif Font.
 // @version 0.1
-// @include *
-// @match *://*/*
+// @include *://*
+// @match *://*
 // @grant none
 // ==/UserScript==
 
