@@ -4,13 +4,20 @@
 // @author yzrsng
 // @description Userscript for Invert Rendering. 背景画像を含むメディアを反転させるスクリプト。
 // @version 0.1
-// @include *
-// @match *://*/*
+// @include http://*
+// @include https://*
+// @match http://*
+// @match https://*
 // @grant none
 // ==/UserScript==
 
 (function() {
   'use strict';
+  
+  /**
+   * [to do]
+   * デスクトップブラウザでiframeの中身に巡回するのを止める
+   */
   
   // remove build in filter for Invert mode on Yuzu Browser
   const yuzubrowserInvertModeStyle = document.getElementById('yuzubrowser_invert_mode');
