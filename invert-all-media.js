@@ -15,8 +15,10 @@
   'use strict';
   
   /**
-   * [to do]
-   * デスクトップブラウザでiframeの中身に巡回するのを止める
+   * # TODO
+   * 
+   * デスクトップブラウザでiframeの中身に巡回するのを防ぐ
+   * サイト側のCSS切り替えに対応 observer
    */
   
   // remove build in filter for Invert mode on Yuzu Browser
@@ -37,7 +39,7 @@
   myCss.insertAdjacentHTML('beforeend', 'embed:not(.' + invertClassChild + '),');
   myCss.insertAdjacentHTML('beforeend', 'video:not(.' + invertClassChild + '),');
   myCss.insertAdjacentHTML('beforeend', 'canvas:not(.' + invertClassChild + '),');
-  myCss.insertAdjacentHTML('beforeend', '.' + invertClassRoot + '{filter:invert(100%)}');
+  myCss.insertAdjacentHTML('beforeend', '.' + invertClassRoot + '{filter:invert(1)}');
   document.getElementsByTagName('head')[0].appendChild(myCss);
 
   const invertExistingFilterClass = "invertedFilterElement-yz-";
@@ -124,7 +126,7 @@
           grantBgColorCount++;
         }
         const filterValue = ssStyle.getPropertyValue('filter');
-        if (filterValue !== "none") {
+        if (filterValue !== "none" && filterValue !== "invert(1)") {
           elms[i].classList.add(invertExistingFilterClass + invertExistingFilterCount);
           myCss.insertAdjacentHTML('beforeend', "." + invertExistingFilterClass + invertExistingFilterCount + "{filter:" + filterValue + " invert(1)" + "}");
           invertExistingFilterCount++;
