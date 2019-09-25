@@ -26,13 +26,13 @@
   document.getElementsByTagName("body")[0].setAttribute("link", "red");
   document.getElementsByTagName("body")[0].setAttribute("vlink", "red");
   
-  const twElements = document.getElementsByTagName('*');
-  for (let i = 0; i < twElements.length; i++) {
+  const elms = document.querySelectorAll('*');
+  for (let i = 0; i < elms.length; i++) {
     // 多重反転を防ぐために小要素を持たない要素のみ
-    if (twElements[i].childElementCount === 0) {
+    if (elms[i].childElementCount === 0) {
       // 背景画像を設定している要素のみを反転
-      if (window.getComputedStyle(twElements[i]).getPropertyValue('background-image').match(/url\(/)) {
-        twElements[i].classList.add(invertClass);
+      if (window.getComputedStyle(elms[i]).getPropertyValue('background-image').match(/url\(/)) {
+        elms[i].classList.add(invertClass);
       }
     }
   }  
