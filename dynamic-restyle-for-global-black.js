@@ -12,7 +12,7 @@
 // ==/UserScript==
 
 /*
-ウェブサイトの変化を検知して動的に色を変更する。
+ウェブサイトの要素の増減を検知して動的に色を変更する。
 パフォーマンスが悪い。
 ウェブサイトの変化を確認する間隔はsetTimeoutで指定。標準は0.5秒。
 
@@ -609,7 +609,8 @@ const cssColorNamesTable = [
   let needToWork = false;
   const options = {
     attributes: true,
-    attributeFilter: ["class", "style"],
+    attributeFilter: ["style"], //一部のスタイルの変化を検知
+    // attributeFilter: ["class", "style"], //全てのスタイルの変化を検知
     childList: true,
     subtree: true
   }
