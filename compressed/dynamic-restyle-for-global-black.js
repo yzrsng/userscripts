@@ -14,7 +14,7 @@
 /*
 圧縮版。パフォーマンスが悪いので悪あがき。
 
-ウェブサイトの変化を検知して動的に色を変更する。
+ウェブサイトの要素の増減を検知して動的に色を変更する。
 パフォーマンスが悪い。
 ウェブサイトの変化を確認する間隔はsetTimeoutで指定。標準は0.5秒。
 
@@ -49,5 +49,5 @@ a[c].hasAttribute("data-userscript-drs4gb-origin-bgcolor")&&l!==a[c].getAttribut
 (a[c].setAttribute("data-userscript-drs4gb-origin-fcolor",h),a[c].style.setProperty("--userscript-drs4gb-fcolor",C(h))):"rgba(0, 0, 0, 0)"!==h&&(a[c].setAttribute("data-userscript-drs4gb-origin-fcolor",h),a[c].style.setProperty("--userscript-drs4gb-fcolor",C(h)));if(a[c].hasAttribute("data-userscript-drs4gb-origin-bgimage")&&f!==a[c].getAttribute("data-userscript-drs4gb-origin-bgimage"))if(-1!=f.indexOf("-gradient(")){p("\u4f55\u56de\u76ee\u3060\uff1f");a[c].setAttribute("data-userscript-drs4gb-origin-bgimage",
 f);a[c].style.setProperty("--userscript-drs4gb-bgimage",E(f));continue}else a[c].removeAttribute("data-userscript-drs4gb-origin-bgimage"),a[c].style.setProperty("--userscript-drs4gb-bgimage","");else if(-1!=f.indexOf("-gradient(")){a[c].setAttribute("data-userscript-drs4gb-origin-bgimage",f);a[c].style.setProperty("--userscript-drs4gb-bgimage",E(f));continue}if("HTML"===d||"BODY"===d)-1!=f.indexOf("url(")&&(a[c].hasAttribute("data-userscript-drs4gb-textshadow")||a[c].setAttribute("data-userscript-drs4gb-textshadow",
 ""));else{if("IMG"===d||-1!=f.indexOf("url("))a[c].hasAttribute("data-userscript-drs4gb-origin-bgcolor")?a[c].style.setProperty("--userscript-drs4gb-filtercolor",B(l,.75)):a[c].style.setProperty("--userscript-drs4gb-filtercolor",B(g(a[c]),.75)),a[c].hasAttribute("data-userscript-drs4gb-origin-filters")?e!==a[c].getAttribute("data-userscript-drs4gb-origin-filters")&&a[c].setAttribute("data-userscript-drs4gb-origin-filters",e):a[c].setAttribute("data-userscript-drs4gb-origin-filters",e),"none"===e?
-a[c].style.setProperty("--userscript-drs4gb-filters"," "):a[c].style.setProperty("--userscript-drs4gb-filters",e);"none"!==f&&(a[c].hasAttribute("data-userscript-drs4gb-textshadow")||a[c].setAttribute("data-userscript-drs4gb-textshadow",""))}}}},y=document.getElementsByTagName("*");x(y);m.appendChild(n);var z=!1,q=!1,F={attributes:!0,attributeFilter:["class","style"],childList:!0,subtree:!0},A=new MutationObserver(function(a){!1===z?(z=!0,q=!1,setTimeout(function(){A.disconnect();m.removeChild(n);
-for(x(y);!0===q;)q=!1,x(y);m.appendChild(n);A.observe(document,F);z=!1},500)):!1===q&&(q=!0)});A.observe(document,F)})();
+a[c].style.setProperty("--userscript-drs4gb-filters"," "):a[c].style.setProperty("--userscript-drs4gb-filters",e);"none"!==f&&(a[c].hasAttribute("data-userscript-drs4gb-textshadow")||a[c].setAttribute("data-userscript-drs4gb-textshadow",""))}}}},y=document.getElementsByTagName("*");x(y);m.appendChild(n);var z=!1,q=!1,F={attributes:!0,attributeFilter:["style"],childList:!0,subtree:!0},A=new MutationObserver(function(a){!1===z?(z=!0,q=!1,setTimeout(function(){A.disconnect();m.removeChild(n);for(x(y);!0===
+q;)q=!1,x(y);m.appendChild(n);A.observe(document,F);z=!1},500)):!1===q&&(q=!0)});A.observe(document,F)})();
