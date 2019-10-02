@@ -608,8 +608,8 @@ const cssColorNamesTable = [
   let isRunning = false;
   let needToWork = false;
   const options = {
-    attributes: true,
-    attributeFilter: ["style"], //一部のスタイルの変化を検知
+    // attributes: true,
+    // attributeFilter: ["style"], //一部のスタイルの変化を検知
     // attributeFilter: ["class", "style"], //全てのスタイルの変化を検知
     childList: true,
     subtree: true
