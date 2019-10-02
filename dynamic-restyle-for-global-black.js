@@ -574,11 +574,11 @@ const cssColorNamesTable = [
         continue;
       }
       if (elmTagName === 'IMG' || styleBgimage.indexOf("url(") != -1) {
-        // if (elms[i].hasAttribute(dataOriginBgcolor)) {
-        //   elms[i].style.setProperty(cssVariableNameFilterColor, changeAlphaColor(styleBgColor, 0.75));
-        // } else {
-        //   elms[i].style.setProperty(cssVariableNameFilterColor, changeAlphaColor(returnParentsBgColor(elms[i]), 0.75));
-        // }
+        if (elms[i].hasAttribute(dataOriginBgcolor)) {
+          elms[i].style.setProperty(cssVariableNameFilterColor, changeAlphaColor(styleBgColor, 0.75));
+        } else {
+          elms[i].style.setProperty(cssVariableNameFilterColor, changeAlphaColor(returnParentsBgColor(elms[i]), 0.75));
+        }
         if (elms[i].hasAttribute(dataOriginFilters)) {
           if (styleFilter !== elms[i].getAttribute(dataOriginFilters)) {
             elms[i].setAttribute(dataOriginFilters, styleFilter);
