@@ -3,23 +3,26 @@
 // @namespace drs4gb
 // @author yzrsng
 // @description Userscript to change color on website.
-// @version 0.20191004.1
+// @version 0.20191004.2
 // @include http://*
 // @include https://*
-// @exclude https://store.steampowered.com/
 // @match http://*
 // @match https://*
+// @exclude https://www.deviantart.com/*
+// @exclude https://twitter.com/*
+// @exclude https://mobile.twitter.com/*
+// @exclude https://store.steampowered.com/*
 // @grant none
 // ==/UserScript==
 
 /*
 ウェブページの要素の増減を検知して動的に色を変更する。
 パフォーマンスが悪い。
-ウェブページの変化を確認する間隔はsetTimeoutで指定。標準は0.5秒。
+ウェブページの変化を確認する間隔はsetTimeoutで指定。標準は1.0秒。
 
-色はRGBからHSVに変換していじっている。背景色の明るさは鮮やかさに比例するように設定した。
-背景画像を反転させないが文字が見えなくなっても困るので黒い縁取り文字にした。
-背景色の変化で画像が埋もれると困るので後光が指すようにした。
+色はRGBからHSVに変換していじっている。背景色の明るさは鮮やかさに比例するようにした。
+画像はそのままだが、その上の文字が色の変更で判別できなくなると困るので黒い縁取り文字にした。
+背景色の変化で画像が判別できなくなると困るので後光が指すようにした。
 */
 
 (function(){
@@ -661,7 +664,7 @@
       needToWork = false;
       // printInfo("始め");
       // runProcess(); // 最速
-      setTimeout(() => {runProcess()}, 500); // 間隔を指定
+      setTimeout(() => {runProcess()}, 1000); // 間隔を指定
     } else {
       if (needToWork === false) {
         // printInfo("<< これ、追加です");
