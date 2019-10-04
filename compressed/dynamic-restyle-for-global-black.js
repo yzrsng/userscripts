@@ -3,25 +3,28 @@
 // @namespace drs4gb
 // @author yzrsng
 // @description Userscript to change color on website.
-// @version 0.20191004.1
+// @version 0.20191004.2
 // @include http://*
 // @include https://*
-// @exclude https://store.steampowered.com/
 // @match http://*
 // @match https://*
+// @exclude https://www.deviantart.com/*
+// @exclude https://twitter.com/*
+// @exclude https://mobile.twitter.com/*
+// @exclude https://store.steampowered.com/*
 // @grant none
 // ==/UserScript==
 
 /*
-圧縮版。パフォーマンスが悪いので悪あがき。
+圧縮版。
 
 ウェブページの要素の増減を検知して動的に色を変更する。
 パフォーマンスが悪い。
-ウェブページの変化を確認する間隔はsetTimeoutで指定。標準は0.5秒。
+ウェブページの変化を確認する間隔はsetTimeoutで指定。標準は1.0秒。
 
-色はRGBからHSVに変換していじっている。背景色の明るさは鮮やかさに比例するように設定した。
-背景画像を反転させないが文字が見えなくなっても困るので黒い縁取り文字にした。
-背景色の変化で画像が埋もれると困るので後光が指すようにした。
+色はRGBからHSVに変換していじっている。背景色の明るさは鮮やかさに比例するようにした。
+画像はそのままだが、その上の文字が色の変更で判別できなくなると困るので黒い縁取り文字にした。
+背景色の変化で画像が判別できなくなると困るので後光が指すようにした。
 */
 
 var $jscomp$templatelit$0=["\n:root {\n  background-color: black;\n}\n* {\n  scrollbar-color: #2a2c2e #1c1e1f;\n}\n::-webkit-scrollbar {\n  background-color: #1c1e1f;\n  color: #c5c1b9;\n}\n::-webkit-scrollbar-corner {\n  background-color: #181a1b;\n}\n::-webkit-scrollbar-thumb {\n  background-color: #2a2c2e;\n}\n[","], [","]::placeholder {\n  color: var(",") !important;\n}\n[","]:visited, [","]:visited * {\n  color: var(",") !important;\n}\n[","] {\n  background-color: var(",") !important;\n}\n[",
@@ -52,4 +55,4 @@ l=e.getPropertyValue("background-color"),f=e.getPropertyValue("background-image"
 ""),a[c].style.setProperty("--userscript-drs4gb-fcolor-visited",E(g)))}if(a[c].hasAttribute("data-userscript-drs4gb-origin-bgimage")&&f!==a[c].getAttribute("data-userscript-drs4gb-origin-bgimage"))if(-1!=f.indexOf("-gradient(")){a[c].setAttribute("data-userscript-drs4gb-origin-bgimage",f);a[c].style.setProperty("--userscript-drs4gb-bgimage",C(f));continue}else a[c].removeAttribute("data-userscript-drs4gb-origin-bgimage"),a[c].style.setProperty("--userscript-drs4gb-bgimage","");else if(-1!=f.indexOf("-gradient(")){a[c].setAttribute("data-userscript-drs4gb-origin-bgimage",
 f);a[c].style.setProperty("--userscript-drs4gb-bgimage",C(f));continue}if("IMG"===d||-1!=f.indexOf("url(")){if("HTML"===d||"BODY"===d){a[c].hasAttribute("data-userscript-drs4gb-enable-textshadow")||a[c].setAttribute("data-userscript-drs4gb-enable-textshadow","");continue}a[c].hasAttribute("data-userscript-drs4gb-origin-bgcolor")?a[c].style.setProperty("--userscript-drs4gb-filter-color",B(l,.75)):a[c].style.setProperty("--userscript-drs4gb-filter-color",B(h(a[c]),.75));a[c].hasAttribute("data-userscript-drs4gb-origin-filters")?
 e!==a[c].getAttribute("data-userscript-drs4gb-origin-filters")&&a[c].setAttribute("data-userscript-drs4gb-origin-filters",e):a[c].setAttribute("data-userscript-drs4gb-origin-filters",e);"none"===e?a[c].style.setProperty("--userscript-drs4gb-exist-filters"," "):a[c].style.setProperty("--userscript-drs4gb-exist-filters",e)}"none"!==f&&(a[c].hasAttribute("data-userscript-drs4gb-enable-textshadow")||a[c].setAttribute("data-userscript-drs4gb-enable-textshadow",""))}}},y=document.getElementsByTagName("*");
-x(y);l.appendChild(n);var z=!1,r=!1,D={childList:!0,subtree:!0},A=new MutationObserver(function(a){!1===z?(z=!0,r=!1,setTimeout(function(){A.disconnect();l.removeChild(n);for(x(y);!0===r;)r=!1,x(y);l.appendChild(n);A.observe(document,D);z=!1},500)):!1===r&&(r=!0)});A.observe(document,D)})();
+x(y);l.appendChild(n);var z=!1,r=!1,D={childList:!0,subtree:!0},A=new MutationObserver(function(a){!1===z?(z=!0,r=!1,setTimeout(function(){A.disconnect();l.removeChild(n);for(x(y);!0===r;)r=!1,x(y);l.appendChild(n);A.observe(document,D);z=!1},1E3)):!1===r&&(r=!0)});A.observe(document,D)})();
