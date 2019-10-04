@@ -3,9 +3,10 @@
 // @namespace drs4gb
 // @author yzrsng
 // @description Userscript to change color on website.
-// @version 0.20191004
+// @version 0.20191004.1
 // @include http://*
 // @include https://*
+// @exclude https://store.steampowered.com/
 // @match http://*
 // @match https://*
 // @grant none
@@ -68,7 +69,7 @@
 [${dataOriginFcolor}], [${dataOriginFcolor}]::placeholder {
   color: var(${cssVariableFcolor}) !important;
 }
-[${dataEnableFcolorVisited}]:visited {
+[${dataEnableFcolorVisited}]:visited, [${dataEnableFcolorVisited}]:visited * {
   color: var(${cssVariableFcolorVisited}) !important;
 }
 [${dataOriginBgcolor}] {
@@ -578,8 +579,6 @@
       // 背景グラデーション
       if (elms[i].hasAttribute(dataOriginBgimage) && styleBgimage !== elms[i].getAttribute(dataOriginBgimage)) {
         if (styleBgimage.indexOf("-gradient(") != -1) {
-          // printInfo(styleBgimage);
-          printError("何回目だ？");
           elms[i].setAttribute(dataOriginBgimage, styleBgimage);
           elms[i].style.setProperty(cssVariableBgimage, returnNewGradient(styleBgimage));
           continue;
@@ -588,23 +587,18 @@
           elms[i].style.setProperty(cssVariableBgimage, '');
         }
       } else if (styleBgimage.indexOf("-gradient(") != -1) {
-        // printInfo(styleBgimage);
-        // printInfo(elms[i]);
-        // printInfo(elmTagName);
         elms[i].setAttribute(dataOriginBgimage, styleBgimage);
         elms[i].style.setProperty(cssVariableBgimage, returnNewGradient(styleBgimage));
         continue;
       }
       // 画像、背景画像を装飾
-      if (elmTagName === "HTML" || elmTagName === "BODY") {
-        if (styleBgimage.indexOf("url(") != -1) {
+      if (elmTagName === 'IMG' || styleBgimage.indexOf("url(") != -1) {
+        if (elmTagName === "HTML" || elmTagName === "BODY") {
           if (!elms[i].hasAttribute(dataEnableTextShadow)) {
             elms[i].setAttribute(dataEnableTextShadow, "");
           }
+          continue;
         }
-        continue;
-      }
-      if (elmTagName === 'IMG' || styleBgimage.indexOf("url(") != -1) {
         if (elms[i].hasAttribute(dataOriginBgcolor)) {
           elms[i].style.setProperty(cssVariableFilterColor, changeAlphaColor(styleBgColor, 0.75));
         } else {
