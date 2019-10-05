@@ -3,7 +3,7 @@
 // @namespace drs4gb
 // @author yzrsng
 // @description Userscript to change color on website. The performance of this script is very low.
-// @version 0.20191005.2
+// @version 0.20191006.1
 // @include http://*
 // @include https://*
 // @exclude https://www.deviantart.com/*
