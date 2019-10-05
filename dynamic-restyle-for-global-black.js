@@ -3,7 +3,7 @@
 // @namespace drs4gb
 // @author yzrsng
 // @description Userscript to change color on website.
-// @version 0.20191005.1
+// @version 0.20191005.2
 // @include http://*
 // @include https://*
 // @exclude https://www.deviantart.com/*
@@ -38,12 +38,13 @@
   const dataOriginBgcolor = `data-${cssId}-origin-bgcolor`;
   const dataOriginBgimage = `data-${cssId}-origin-bgimage`;
   const dataOriginFilters = `data-${cssId}-origin-filters`;
+  const dataOriginFilterColor = `data-${cssId}-origin-filter-color`;
 
   const cssVariableFcolor = `--${cssId}-fcolor`;
   const cssVariableFcolorVisited = `--${cssId}-fcolor-visited`;
   const cssVariableBgcolor = `--${cssId}-bgcolor`;
   const cssVariableBgimage = `--${cssId}-bgimage`;
-  const cssVariableExistFilters = `--${cssId}-exist-filters`;
+  const cssVariableOriginFilters = `--${cssId}-origin-filters`;
   const cssVariableFilterColor = `--${cssId}-filter-color`;
   const cssVariableTextShadow = 'rgba(0, 0, 0, 0.5)';
   const head = document.getElementsByTagName('head')[0];
@@ -84,7 +85,7 @@
 }
 [${dataOriginFilters}] {
   background-color: rgba(0, 0, 0, 0) !important;
-  filter: var(${cssVariableExistFilters}) drop-shadow(0px 0px 1px var(${cssVariableFilterColor})) !important;
+  filter: var(${cssVariableOriginFilters}) drop-shadow(0px 0px 1px var(${cssVariableFilterColor})) !important;
 }`);
 
   const cssColorNamesTable = [
@@ -540,21 +541,25 @@
       // 画像を装飾
       if (elmTagName === 'IMG') {
         if (elms[i].hasAttribute(dataOriginBgcolor)) {
-          elms[i].style.setProperty(cssVariableFilterColor, changeAlphaColor(styleBgColor, 0.75));
-        } else {
-          elms[i].style.setProperty(cssVariableFilterColor, changeAlphaColor(returnParentsBgColor(elms[i]), 0.75));
-        }
-        if (elms[i].hasAttribute(dataOriginFilters)) {
-          if (styleFilter !== elms[i].getAttribute(dataOriginFilters)) {
-            elms[i].setAttribute(dataOriginFilters, styleFilter);
+          const originFilterColor = styleBgColor;
+          if (!elms[i].hasAttribute(dataOriginFilterColor) || originFilterColor !== elms[i].getAttribute(dataOriginFilterColor)) {
+            elms[i].style.setProperty(cssVariableFilterColor, changeAlphaColor(originFilterColor, 0.75));
+            elms[i].setAttribute(dataOriginFilterColor, originFilterColor);
           }
         } else {
-          elms[i].setAttribute(dataOriginFilters, styleFilter);
+          const originFilterColor = returnParentsBgColor(elms[i]);
+          if (!elms[i].hasAttribute(dataOriginFilterColor) || originFilterColor !== elms[i].getAttribute(dataOriginFilterColor)) {
+            elms[i].style.setProperty(cssVariableFilterColor, changeAlphaColor(originFilterColor, 0.75));
+            elms[i].setAttribute(dataOriginFilterColor, originFilterColor);
+          }
         }
-        if (styleFilter === "none") {
-          elms[i].style.setProperty(cssVariableExistFilters, " ");
-        } else {
-          elms[i].style.setProperty(cssVariableExistFilters, styleFilter);
+        if (!elms[i].hasAttribute(dataOriginFilters) || styleFilter !== elms[i].getAttribute(dataOriginFilters)) {
+          elms[i].setAttribute(dataOriginFilters, styleFilter);
+          if (styleFilter === "none") {
+            elms[i].style.setProperty(cssVariableOriginFilters, " ");
+          } else {
+            elms[i].style.setProperty(cssVariableOriginFilters, styleFilter);
+          }
         }
         continue;
       }
@@ -567,21 +572,25 @@
           continue;
         }
         if (elms[i].hasAttribute(dataOriginBgcolor)) {
-          elms[i].style.setProperty(cssVariableFilterColor, changeAlphaColor(styleBgColor, 0.75));
-        } else {
-          elms[i].style.setProperty(cssVariableFilterColor, changeAlphaColor(returnParentsBgColor(elms[i]), 0.75));
-        }
-        if (elms[i].hasAttribute(dataOriginFilters)) {
-          if (styleFilter !== elms[i].getAttribute(dataOriginFilters)) {
-            elms[i].setAttribute(dataOriginFilters, styleFilter);
+          const originFilterColor = styleBgColor;
+          if (!elms[i].hasAttribute(dataOriginFilterColor) || originFilterColor !== elms[i].getAttribute(dataOriginFilterColor)) {
+            elms[i].style.setProperty(cssVariableFilterColor, changeAlphaColor(originFilterColor, 0.75));
+            elms[i].setAttribute(dataOriginFilterColor, originFilterColor);
           }
         } else {
-          elms[i].setAttribute(dataOriginFilters, styleFilter);
+          const originFilterColor = returnParentsBgColor(elms[i]);
+          if (!elms[i].hasAttribute(dataOriginFilterColor) || originFilterColor !== elms[i].getAttribute(dataOriginFilterColor)) {
+            elms[i].style.setProperty(cssVariableFilterColor, changeAlphaColor(originFilterColor, 0.75));
+            elms[i].setAttribute(dataOriginFilterColor, originFilterColor);
+          }
         }
-        if (styleFilter === "none") {
-          elms[i].style.setProperty(cssVariableExistFilters, " ");
-        } else {
-          elms[i].style.setProperty(cssVariableExistFilters, styleFilter);
+        if (!elms[i].hasAttribute(dataOriginFilters) || styleFilter !== elms[i].getAttribute(dataOriginFilters)) {
+          elms[i].setAttribute(dataOriginFilters, styleFilter);
+          if (styleFilter === "none") {
+            elms[i].style.setProperty(cssVariableOriginFilters, " ");
+          } else {
+            elms[i].style.setProperty(cssVariableOriginFilters, styleFilter);
+          }
         }
       }
       // 背景グラデーション
