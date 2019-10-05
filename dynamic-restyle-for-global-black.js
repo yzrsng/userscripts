@@ -3,15 +3,9 @@
 // @namespace drs4gb
 // @author yzrsng
 // @description Userscript to change color on website.
-// @version 0.20191004.2
+// @version 0.20191005.1
 // @include http://*
 // @include https://*
-// @match http://*
-// @match https://*
-// @exclude https://www.deviantart.com/*
-// @exclude https://twitter.com/*
-// @exclude https://mobile.twitter.com/*
-// @exclude https://store.steampowered.com/*
 // @grant none
 // ==/UserScript==
 
@@ -353,17 +347,14 @@
   }
 
   const ToNumForDecClr = (clrAry) => {
-    // printInfo(clrAry);
     let numAry = new Array(3);
     for (let i = 0; i < 3; i++) {
       numAry[i] = parseInt(clrAry[i], 10);
     }
-    // printInfo(numAry);
     return numAry;
   }
 
   const toAryForDecClr = (clrStr) => {
-    // printInfo(clrStr);
     const clrValue = clrStr.substring(clrStr.indexOf("(", 3)+1,clrStr.length-1);
     const clrArray = clrValue.split(', ');
     return clrArray;
@@ -445,22 +436,16 @@
     for (let i = 0; i < cssColorNamesTable.length; i++) {
       tmpGradient = replaceAll(tmpGradient, cssColorNamesTable[i][0], cssColorNamesTable[i][1]);
     }
-    // printInfo(oldGradient);
-    // printInfo(tmpGradient);
-    // return tmpGradient;
     // 一度認識できる色をすべて配列にまとめる
     // 文章の連結を最後にする
     let posRgbTmp = tmpGradient.indexOf("rgb");
-    // printInfo(posRgbTmp);
     let posDecClrStart = [];
     let posDecClrEnd = [];
     let loopCount = 0;
     while (posRgbTmp !== -1) {
-      // printError(loopCount + "回目");
       posDecClrStart.push(posRgbTmp);
       posDecClrEnd.push(tmpGradient.indexOf(")", posDecClrStart[loopCount]+11)+1);
       posRgbTmp = tmpGradient.indexOf("rgb", posDecClrEnd[loopCount]);
-      // printInfo(posRgbTmp);
       loopCount++;
       if (loopCount > 50) {
         printError("Infinity Loop on analyze gradient.");
@@ -468,19 +453,14 @@
         break;
       }
     }
-    // printInfo("start: "+posDecClrStart);
-    // printInfo("end:   "+posDecClrEnd);
     let rgbStrs = [];
     for (let i = 0; i < posDecClrStart.length; i++) {
       rgbStrs.push(tmpGradient.substring(posDecClrStart[i], posDecClrEnd[i]));
     }
-    // printInfo(rgbStrs);
     let hsvStrs = [];
     for (let i = 0; i < rgbStrs.length; i++) {
       const tmpRgbArray = toAryForDecClr(rgbStrs[i]);
-      // printInfo(tmpRgbArray);
       const hsvAry = rgbToHsv(ToNumForDecClr(tmpRgbArray));
-      // printInfo(hsvAry);
       // 色相を変更
       if (hsvAry[0] <= 360) { // Hueは360以下が正常
         hsvAry[0] -= 345;
@@ -498,10 +478,9 @@
         hsvStrs.push(`rgb(${rgbAry[0]}, ${rgbAry[1]}, ${rgbAry[2]})`);
       }
     }
-    // printInfo(hsvStrs);
     if (hsvStrs.length !== posDecClrStart.length || hsvStrs.length !== posDecClrEnd.length) {
       printError("配列の長さが違う");
-      return tmpGradient;
+      return oldGradient;
     }
     let newGradient = '';
     for (let i = 0; i < hsvStrs.length; i++) {
@@ -515,10 +494,7 @@
         newGradient += tmpGradient.substring(posDecClrEnd[i], posDecClrStart[i + 1]);
       }
     }
-    // printInfo(tmpGradient);
-    // printInfo(newGradient);
     return newGradient;
-    // return "none";
   }
   
   function markChildElms(elms) {
@@ -530,22 +506,11 @@
 
   const markElements = (elms) => {
     const elmsLength = elms.length;
-    // printInfo("要素の数: " + elmsLength);
     for (let i = 0; i < elmsLength; i++) {
-      // printInfo(i + "個目の要素の処理")
       const elmTagName = elms[i].tagName;
-      // printInfo(elmTagName);
-      const elmStyle = window.getComputedStyle(elms[i], null);
       if (elmTagName === "LINK" || elmTagName === "META" || elmTagName === "SCRIPT" || elmTagName === "NOSCRIPT" || elmTagName === "STYLE" || elmTagName === "HEAD" || elmTagName === "TITLE") {
         continue;
       }
-      // const styleDisplay = elmStyle.getPropertyValue("display");
-      // if (styleDisplay === "none") { // cssの@によるスタイル変更に対応できない
-      //   // if (elmTagName.match(/[A-Z]/)) {
-      //   //   printInfo(elmTagName);
-      //   // }
-      //   continue;
-      // }
       if (elms[i].hasAttribute(dataSkipMath)) {
         continue;
       }
@@ -554,48 +519,43 @@
         markChildElms(elms[i].children);
         continue;
       }
+      const elmStyle = window.getComputedStyle(elms[i], null);
+      // const styleDisplay = elmStyle.getPropertyValue("display");
+      // if (styleDisplay === "none") { // cssの@によるスタイル変更に対応できない
+      //   continue;
+      // }
       const styleFcolor = elmStyle.getPropertyValue("color");
       const styleBgColor = elmStyle.getPropertyValue("background-color");
       const styleBgimage = elmStyle.getPropertyValue("background-image");
       const styleFilter = elmStyle.getPropertyValue("filter");
-      // printInfo(styleFcolor);
-      // printInfo(styleBgColor);
-      // printInfo(styleBgimage);
       // 背景色
       if (elms[i].hasAttribute(dataOriginBgcolor) && styleBgColor !== elms[i].getAttribute(dataOriginBgcolor) || styleBgColor !== 'rgba(0, 0, 0, 0)') {
-        elms[i].setAttribute(dataOriginBgcolor, styleBgColor);
         elms[i].style.setProperty(cssVariableBgcolor, returnNewBackColor(styleBgColor));
+        elms[i].setAttribute(dataOriginBgcolor, styleBgColor);
       }
-      // 前景色
-      if (elms[i].hasAttribute(dataOriginFcolor) && styleFcolor !== elms[i].getAttribute(dataOriginFcolor) || styleFcolor !== 'rgba(0, 0, 0, 0)') {
-        elms[i].setAttribute(dataOriginFcolor, styleFcolor);
-        const newFrontColor = returnNewFrontColor(styleFcolor);
-        elms[i].style.setProperty(cssVariableFcolor, newFrontColor);
-        // visited
-        if (elmTagName === "A") {
-          if (!elms[i].hasAttribute(dataEnableFcolorVisited)) {
-            elms[i].setAttribute(dataEnableFcolorVisited, "");
-          }
-          elms[i].style.setProperty(cssVariableFcolorVisited, returnNewVisitedColor(newFrontColor));
-        }
-      }
-      // 背景グラデーション
-      if (elms[i].hasAttribute(dataOriginBgimage) && styleBgimage !== elms[i].getAttribute(dataOriginBgimage)) {
-        if (styleBgimage.indexOf("-gradient(") != -1) {
-          elms[i].setAttribute(dataOriginBgimage, styleBgimage);
-          elms[i].style.setProperty(cssVariableBgimage, returnNewGradient(styleBgimage));
-          continue;
+      // 画像を装飾
+      if (elmTagName === 'IMG') {
+        if (elms[i].hasAttribute(dataOriginBgcolor)) {
+          elms[i].style.setProperty(cssVariableFilterColor, changeAlphaColor(styleBgColor, 0.75));
         } else {
-          elms[i].removeAttribute(dataOriginBgimage);
-          elms[i].style.setProperty(cssVariableBgimage, '');
+          elms[i].style.setProperty(cssVariableFilterColor, changeAlphaColor(returnParentsBgColor(elms[i]), 0.75));
         }
-      } else if (styleBgimage.indexOf("-gradient(") != -1) {
-        elms[i].setAttribute(dataOriginBgimage, styleBgimage);
-        elms[i].style.setProperty(cssVariableBgimage, returnNewGradient(styleBgimage));
+        if (elms[i].hasAttribute(dataOriginFilters)) {
+          if (styleFilter !== elms[i].getAttribute(dataOriginFilters)) {
+            elms[i].setAttribute(dataOriginFilters, styleFilter);
+          }
+        } else {
+          elms[i].setAttribute(dataOriginFilters, styleFilter);
+        }
+        if (styleFilter === "none") {
+          elms[i].style.setProperty(cssVariableExistFilters, " ");
+        } else {
+          elms[i].style.setProperty(cssVariableExistFilters, styleFilter);
+        }
         continue;
       }
-      // 画像、背景画像を装飾
-      if (elmTagName === 'IMG' || styleBgimage.indexOf("url(") != -1) {
+      // 背景画像を装飾
+      if (styleBgimage.indexOf("url(") !== -1) {
         if (elmTagName === "HTML" || elmTagName === "BODY") {
           if (!elms[i].hasAttribute(dataEnableTextShadow)) {
             elms[i].setAttribute(dataEnableTextShadow, "");
@@ -620,9 +580,34 @@
           elms[i].style.setProperty(cssVariableExistFilters, styleFilter);
         }
       }
-      if (styleBgimage !== "none") {
+      // 背景グラデーション
+      if (elms[i].hasAttribute(dataOriginBgimage) && styleBgimage !== elms[i].getAttribute(dataOriginBgimage)) {
+        if (styleBgimage.indexOf("-gradient(") !== -1) {
+          elms[i].style.setProperty(cssVariableBgimage, returnNewGradient(styleBgimage));
+          elms[i].setAttribute(dataOriginBgimage, styleBgimage);
+        } else {
+          elms[i].removeAttribute(dataOriginBgimage);
+          elms[i].style.setProperty(cssVariableBgimage, '');
+        }
+      } else if (styleBgimage.indexOf("-gradient(") !== -1) {
+        elms[i].style.setProperty(cssVariableBgimage, returnNewGradient(styleBgimage));
+        elms[i].setAttribute(dataOriginBgimage, styleBgimage);
+      } else if (styleBgimage !== "none") { // 背景が画像の要素とその子孫要素に縁取り
         if (!elms[i].hasAttribute(dataEnableTextShadow)) {
           elms[i].setAttribute(dataEnableTextShadow, "");
+        }
+      }
+      // 前景色
+      if (elms[i].hasAttribute(dataOriginFcolor) && styleFcolor !== elms[i].getAttribute(dataOriginFcolor) || styleFcolor !== 'rgba(0, 0, 0, 0)') {
+        const newFrontColor = returnNewFrontColor(styleFcolor);
+        elms[i].style.setProperty(cssVariableFcolor, newFrontColor);
+        elms[i].setAttribute(dataOriginFcolor, styleFcolor);
+        // visited
+        if (elmTagName === "A") {
+          if (!elms[i].hasAttribute(dataEnableFcolorVisited)) {
+            elms[i].setAttribute(dataEnableFcolorVisited, "");
+          }
+          elms[i].style.setProperty(cssVariableFcolorVisited, returnNewVisitedColor(newFrontColor));
         }
       }
     }
@@ -630,7 +615,6 @@
 
   const myElms = document.getElementsByTagName('*');
   markElements(myElms);
-  // printInfo("1回目");
   head.appendChild(css);
 
   let isRunning = false;
