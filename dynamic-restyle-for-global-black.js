@@ -509,8 +509,27 @@
     }
   }
 
-  const markElements = (elms) => {
+  const markElements = () => {
+    const elms = document.getElementsByTagName('*');
     const elmsLength = elms.length;
+    let existStyleAry = new Array(elmsLength);
+    for (let i = 0; i < elmsLength; i++) {
+      const elmTagName = elms[i].tagName;
+      existStyleAry[i] = new Array(5);
+      for (let j = 0; j < existStyleAry[i].length; j++) {
+        existStyleAry[i][j] = false;
+      }
+      const elmStyle = window.getComputedStyle(elms[i], null);
+      existStyleAry[i][0] = elmStyle.getPropertyValue("color");
+      existStyleAry[i][1] = elmStyle.getPropertyValue("background-color");
+      existStyleAry[i][2] = elmStyle.getPropertyValue("background-image");
+      existStyleAry[i][3] = elmStyle.getPropertyValue("filter");
+      if (elmTagName === 'IMG' && existStyleAry[i][1] === "rgba(0, 0, 0, 0)") {
+        existStyleAry[i][4] = returnParentsBgColor(elms[i]);
+      } else if (existStyleAry[i][2].indexOf("url(") !== -1 && existStyleAry[i][1] === "rgba(0, 0, 0, 0)" && elmTagName !== "HTML" && elmTagName !== "BODY") {
+        existStyleAry[i][4] = returnParentsBgColor(elms[i]);
+      }
+    }
     for (let i = 0; i < elmsLength; i++) {
       const elmTagName = elms[i].tagName;
       if (elmTagName === "LINK" || elmTagName === "META" || elmTagName === "SCRIPT" || elmTagName === "NOSCRIPT" || elmTagName === "STYLE" || elmTagName === "HEAD" || elmTagName === "TITLE") {
@@ -524,15 +543,14 @@
         markChildElms(elms[i].children);
         continue;
       }
-      const elmStyle = window.getComputedStyle(elms[i], null);
       // const styleDisplay = elmStyle.getPropertyValue("display");
       // if (styleDisplay === "none") { // cssの@によるスタイル変更に対応できない
       //   continue;
       // }
-      const styleFcolor = elmStyle.getPropertyValue("color");
-      const styleBgColor = elmStyle.getPropertyValue("background-color");
-      const styleBgimage = elmStyle.getPropertyValue("background-image");
-      const styleFilter = elmStyle.getPropertyValue("filter");
+      const styleFcolor = existStyleAry[i][0]
+      const styleBgColor = existStyleAry[i][1]
+      const styleBgimage = existStyleAry[i][2]
+      const styleFilter = existStyleAry[i][3]
       // 背景色
       if (elms[i].hasAttribute(dataOriginBgcolor) && styleBgColor !== elms[i].getAttribute(dataOriginBgcolor) || styleBgColor !== 'rgba(0, 0, 0, 0)') {
         elms[i].style.setProperty(cssVariableBgcolor, returnNewBackColor(styleBgColor));
@@ -547,7 +565,7 @@
             elms[i].setAttribute(dataOriginFilterColor, originFilterColor);
           }
         } else {
-          const originFilterColor = returnParentsBgColor(elms[i]);
+          const originFilterColor = existStyleAry[i][4];
           if (!elms[i].hasAttribute(dataOriginFilterColor) || originFilterColor !== elms[i].getAttribute(dataOriginFilterColor)) {
             elms[i].style.setProperty(cssVariableFilterColor, changeAlphaColor(originFilterColor, 0.75));
             elms[i].setAttribute(dataOriginFilterColor, originFilterColor);
@@ -578,7 +596,7 @@
             elms[i].setAttribute(dataOriginFilterColor, originFilterColor);
           }
         } else {
-          const originFilterColor = returnParentsBgColor(elms[i]);
+          const originFilterColor = existStyleAry[i][4];
           if (!elms[i].hasAttribute(dataOriginFilterColor) || originFilterColor !== elms[i].getAttribute(dataOriginFilterColor)) {
             elms[i].style.setProperty(cssVariableFilterColor, changeAlphaColor(originFilterColor, 0.75));
             elms[i].setAttribute(dataOriginFilterColor, originFilterColor);
@@ -626,8 +644,7 @@
     }
   };
 
-  const myElms = document.getElementsByTagName('*');
-  markElements(myElms);
+  markElements();
   head.appendChild(css);
 
   let isRunning = false;
@@ -645,11 +662,11 @@
     const runProcess = () => {
       observer.disconnect();
       head.removeChild(css);
-      markElements(myElms);
+      markElements();
       while (needToWork === true) {
         // printInfo("残業か……");
         needToWork = false;
-        markElements(myElms);
+        markElements();
       }
       head.appendChild(css);
       observer.observe(document, options);
