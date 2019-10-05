@@ -6,6 +6,10 @@
 // @version 0.20191005.1
 // @include http://*
 // @include https://*
+// @exclude https://www.deviantart.com/*
+// @exclude https://twitter.com/*
+// @exclude https://mobile.twitter.com/*
+// @exclude https://store.steampowered.com/*
 // @grant none
 // ==/UserScript==
 
