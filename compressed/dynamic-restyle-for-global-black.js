@@ -2,7 +2,7 @@
 // @name Dynamic Restyle Script for Global Black
 // @namespace drs4gb
 // @author yzrsng
-// @description Userscript to change color on website.
+// @description Userscript to change color on website. The performance of this script is very low.
 // @version 0.20191005.2
 // @include http://*
 // @include https://*
@@ -21,7 +21,7 @@
 ウェブページの変化を確認する間隔はsetTimeoutで指定。標準は1.0秒。
 
 色はRGBからHSVに変換していじっている。背景色の明るさは鮮やかさに比例するようにした。
-画像はそのままだが、その上の文字が色の変更で判別できなくなると困るので黒い縁取り文字にした。
+画像の上の文字が色の変更で判別できなくなると困るので黒い縁取り文字にした。
 背景色の変化で画像が判別できなくなると困るので後光が指すようにした。
 */
 
