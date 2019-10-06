@@ -3,7 +3,7 @@
 // @namespace drs4gb
 // @author yzrsng
 // @description Userscript to change color on website. The performance of this script is very low.
-// @version 0.20191006.1
+// @version 0.20191006.2
 // @include http://*
 // @include https://*
 // @exclude https://www.deviantart.com/*
@@ -648,7 +648,6 @@
   head.appendChild(css);
 
   let isRunning = false;
-  let needToWork = false;
   const options = {
     // attributes: true,
     // attributeFilter: ["style"], //一部のスタイルの変化を検知
@@ -663,11 +662,6 @@
       observer.disconnect();
       head.removeChild(css);
       markElements();
-      while (needToWork === true) {
-        // printInfo("残業か……");
-        needToWork = false;
-        markElements();
-      }
       head.appendChild(css);
       observer.observe(document, options);
       isRunning = false;
@@ -675,15 +669,9 @@
     };
     if (isRunning === false) {
       isRunning = true;
-      needToWork = false;
       // printInfo("始め");
       // runProcess(); // 最速
       setTimeout(() => {runProcess()}, 1000); // 間隔を指定
-    } else {
-      if (needToWork === false) {
-        // printInfo("<< これ、追加です");
-        needToWork = true;
-      }
     }
   });
   observer.observe(document, options);
