@@ -3,7 +3,7 @@
 // @namespace drs4gb
 // @author yzrsng
 // @description Userscript to change color on website. The performance of this script is very low.
-// @version 0.20191006.2
+// @version 0.20191006.3
 // @include http://*
 // @include https://*
 // @exclude https://www.deviantart.com/*
@@ -283,7 +283,7 @@
     }
     const rgbMax = Math.max(...rgbAry);
     const rgbMin = Math.min(...rgbAry);
-    let hsvAry = new Array(3);
+    const hsvAry = new Array(3);
 
     const calcHuePart = (clr1, clr2) => {
       return 60 * (clr1 - clr2) / (rgbMax - rgbMin);
@@ -313,7 +313,7 @@
   }
 
   const hsvToRgb = (hsvAry) => {
-    let rgbAry = new Array(3);
+    const rgbAry = new Array(3);
     const hsvMax = hsvAry[2];
     const hsvMin = hsvMax - Math.round(hsvAry[1] / 255 * hsvMax);
     if (hsvAry[0] > 360) { // Hueは360以下が正常
@@ -352,7 +352,7 @@
   }
 
   const ToNumForDecClr = (clrAry) => {
-    let numAry = new Array(3);
+    const numAry = new Array(3);
     for (let i = 0; i < 3; i++) {
       numAry[i] = parseInt(clrAry[i], 10);
     }
@@ -444,8 +444,8 @@
     // 一度認識できる色をすべて配列にまとめる
     // 文章の連結を最後にする
     let posRgbTmp = tmpGradient.indexOf("rgb");
-    let posDecClrStart = [];
-    let posDecClrEnd = [];
+    const posDecClrStart = [];
+    const posDecClrEnd = [];
     let loopCount = 0;
     while (posRgbTmp !== -1) {
       posDecClrStart.push(posRgbTmp);
@@ -458,11 +458,11 @@
         break;
       }
     }
-    let rgbStrs = [];
+    const rgbStrs = [];
     for (let i = 0; i < posDecClrStart.length; i++) {
       rgbStrs.push(tmpGradient.substring(posDecClrStart[i], posDecClrEnd[i]));
     }
-    let hsvStrs = [];
+    const hsvStrs = [];
     for (let i = 0; i < rgbStrs.length; i++) {
       const tmpRgbArray = toAryForDecClr(rgbStrs[i]);
       const hsvAry = rgbToHsv(ToNumForDecClr(tmpRgbArray));
@@ -512,26 +512,27 @@
   const markElements = () => {
     const elms = document.getElementsByTagName('*');
     const elmsLength = elms.length;
-    let existStyleAry = new Array(elmsLength);
+    const existStyleAry = new Array(elmsLength);
     for (let i = 0; i < elmsLength; i++) {
-      const elmTagName = elms[i].tagName;
-      existStyleAry[i] = new Array(5);
+      existStyleAry[i] = new Array(6);
       for (let j = 0; j < existStyleAry[i].length; j++) {
         existStyleAry[i][j] = false;
       }
       const elmStyle = window.getComputedStyle(elms[i], null);
-      existStyleAry[i][0] = elmStyle.getPropertyValue("color");
-      existStyleAry[i][1] = elmStyle.getPropertyValue("background-color");
-      existStyleAry[i][2] = elmStyle.getPropertyValue("background-image");
-      existStyleAry[i][3] = elmStyle.getPropertyValue("filter");
-      if (elmTagName === 'IMG' && existStyleAry[i][1] === "rgba(0, 0, 0, 0)") {
-        existStyleAry[i][4] = returnParentsBgColor(elms[i]);
-      } else if (existStyleAry[i][2].indexOf("url(") !== -1 && existStyleAry[i][1] === "rgba(0, 0, 0, 0)" && elmTagName !== "HTML" && elmTagName !== "BODY") {
-        existStyleAry[i][4] = returnParentsBgColor(elms[i]);
+      existStyleAry[i][0] = elms[i].tagName;
+      existStyleAry[i][1] = elmStyle.getPropertyValue("color");
+      existStyleAry[i][2] = elmStyle.getPropertyValue("background-color");
+      existStyleAry[i][3] = elmStyle.getPropertyValue("background-image");
+      existStyleAry[i][4] = elmStyle.getPropertyValue("filter");
+      const elmTagName = existStyleAry[i][0];
+      if (elmTagName === 'IMG' && existStyleAry[i][2] === "rgba(0, 0, 0, 0)") {
+        existStyleAry[i][5] = returnParentsBgColor(elms[i]);
+      } else if (existStyleAry[i][3].indexOf("url(") !== -1 && existStyleAry[i][2] === "rgba(0, 0, 0, 0)" && elmTagName !== "HTML" && elmTagName !== "BODY") {
+        existStyleAry[i][5] = returnParentsBgColor(elms[i]);
       }
     }
     for (let i = 0; i < elmsLength; i++) {
-      const elmTagName = elms[i].tagName;
+      const elmTagName = existStyleAry[i][0];
       if (elmTagName === "LINK" || elmTagName === "META" || elmTagName === "SCRIPT" || elmTagName === "NOSCRIPT" || elmTagName === "STYLE" || elmTagName === "HEAD" || elmTagName === "TITLE") {
         continue;
       }
@@ -547,10 +548,11 @@
       // if (styleDisplay === "none") { // cssの@によるスタイル変更に対応できない
       //   continue;
       // }
-      const styleFcolor = existStyleAry[i][0]
-      const styleBgColor = existStyleAry[i][1]
-      const styleBgimage = existStyleAry[i][2]
-      const styleFilter = existStyleAry[i][3]
+      const styleFcolor = existStyleAry[i][1];
+      const styleBgColor = existStyleAry[i][2];
+      const styleBgimage = existStyleAry[i][3];
+      const styleFilter = existStyleAry[i][4];
+      let originFilterColor = existStyleAry[i][5];
       // 背景色
       if (elms[i].hasAttribute(dataOriginBgcolor) && styleBgColor !== elms[i].getAttribute(dataOriginBgcolor) || styleBgColor !== 'rgba(0, 0, 0, 0)') {
         elms[i].style.setProperty(cssVariableBgcolor, returnNewBackColor(styleBgColor));
@@ -558,18 +560,12 @@
       }
       // 画像を装飾
       if (elmTagName === 'IMG') {
-        if (elms[i].hasAttribute(dataOriginBgcolor)) {
-          const originFilterColor = styleBgColor;
-          if (!elms[i].hasAttribute(dataOriginFilterColor) || originFilterColor !== elms[i].getAttribute(dataOriginFilterColor)) {
-            elms[i].style.setProperty(cssVariableFilterColor, changeAlphaColor(originFilterColor, 0.75));
-            elms[i].setAttribute(dataOriginFilterColor, originFilterColor);
-          }
-        } else {
-          const originFilterColor = existStyleAry[i][4];
-          if (!elms[i].hasAttribute(dataOriginFilterColor) || originFilterColor !== elms[i].getAttribute(dataOriginFilterColor)) {
-            elms[i].style.setProperty(cssVariableFilterColor, changeAlphaColor(originFilterColor, 0.75));
-            elms[i].setAttribute(dataOriginFilterColor, originFilterColor);
-          }
+        if (originFilterColor === false) {
+          originFilterColor = styleBgColor;
+        }
+        if (!elms[i].hasAttribute(dataOriginFilterColor) || originFilterColor !== elms[i].getAttribute(dataOriginFilterColor)) {
+          elms[i].style.setProperty(cssVariableFilterColor, changeAlphaColor(originFilterColor, 0.75));
+          elms[i].setAttribute(dataOriginFilterColor, originFilterColor);
         }
         if (!elms[i].hasAttribute(dataOriginFilters) || styleFilter !== elms[i].getAttribute(dataOriginFilters)) {
           elms[i].setAttribute(dataOriginFilters, styleFilter);
@@ -589,18 +585,12 @@
           }
           continue;
         }
-        if (elms[i].hasAttribute(dataOriginBgcolor)) {
-          const originFilterColor = styleBgColor;
-          if (!elms[i].hasAttribute(dataOriginFilterColor) || originFilterColor !== elms[i].getAttribute(dataOriginFilterColor)) {
-            elms[i].style.setProperty(cssVariableFilterColor, changeAlphaColor(originFilterColor, 0.75));
-            elms[i].setAttribute(dataOriginFilterColor, originFilterColor);
-          }
-        } else {
-          const originFilterColor = existStyleAry[i][4];
-          if (!elms[i].hasAttribute(dataOriginFilterColor) || originFilterColor !== elms[i].getAttribute(dataOriginFilterColor)) {
-            elms[i].style.setProperty(cssVariableFilterColor, changeAlphaColor(originFilterColor, 0.75));
-            elms[i].setAttribute(dataOriginFilterColor, originFilterColor);
-          }
+        if (originFilterColor === false) {
+          originFilterColor = styleBgColor;
+        }
+        if (!elms[i].hasAttribute(dataOriginFilterColor) || originFilterColor !== elms[i].getAttribute(dataOriginFilterColor)) {
+          elms[i].style.setProperty(cssVariableFilterColor, changeAlphaColor(originFilterColor, 0.75));
+          elms[i].setAttribute(dataOriginFilterColor, originFilterColor);
         }
         if (!elms[i].hasAttribute(dataOriginFilters) || styleFilter !== elms[i].getAttribute(dataOriginFilters)) {
           elms[i].setAttribute(dataOriginFilters, styleFilter);
