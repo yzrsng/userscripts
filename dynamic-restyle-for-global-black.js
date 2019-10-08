@@ -3,13 +3,9 @@
 // @namespace drs4gb
 // @author yzrsng
 // @description Userscript to change color on website. The performance of this script is very low.
-// @version 0.20191008.1
+// @version 0.20191008.2
 // @include http://*
 // @include https://*
-// @exclude https://www.deviantart.com/*
-// @exclude https://twitter.com/*
-// @exclude https://mobile.twitter.com/*
-// @exclude https://store.steampowered.com/*
 // @grant none
 // ==/UserScript==
 
@@ -669,9 +665,11 @@
   });
   observer.observe(document, options);
   
-  window.addEventListener('load', () => {
-    setTimeout(() => {
-      needRework = false;
-    }, 5000);
-  });
+  if (window.navigator.userAgent.indexOf("Android") !== -1) {
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        needRework = false;
+      }, 3000);
+    });
+  }
 })();
