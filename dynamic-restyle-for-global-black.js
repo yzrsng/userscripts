@@ -3,7 +3,7 @@
 // @namespace drs4gb
 // @author yzrsng
 // @description Userscript to change color on website. The performance of this script is very low.
-// @version 0.20191006.3
+// @version 0.20191008.1
 // @include http://*
 // @include https://*
 // @exclude https://www.deviantart.com/*
@@ -638,6 +638,7 @@
   head.appendChild(css);
 
   let isRunning = false;
+  let needRework = true;
   const options = {
     // attributes: true,
     // attributeFilter: ["style"], //一部のスタイルの変化を検知
@@ -650,12 +651,14 @@
     // console.count(scriptName + " COUNT: " + "Detected document changes");
     const runProcess = () => {
       observer.disconnect();
-      head.removeChild(css);
-      markElements();
-      head.appendChild(css);
-      observer.observe(document, options);
-      isRunning = false;
-      // printInfo("終わり");
+      if (needRework) {
+        head.removeChild(css);
+        markElements();
+        head.appendChild(css);
+        observer.observe(document, options);
+        isRunning = false;
+        // printInfo("終わり");
+      }
     };
     if (isRunning === false) {
       isRunning = true;
@@ -665,4 +668,10 @@
     }
   });
   observer.observe(document, options);
+  
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      needRework = false;
+    }, 5000);
+  });
 })();
