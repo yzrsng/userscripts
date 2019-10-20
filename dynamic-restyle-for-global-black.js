@@ -3,7 +3,7 @@
 // @namespace drs4gb
 // @author yzrsng
 // @description Userscript to change color on website. The performance of this script is very low.
-// @version 0.20191021.1
+// @version 0.20191021.2
 // @include http://*
 // @include https://*
 // @grant none
@@ -237,6 +237,10 @@
 
   function printInfo(messageStr) {
     console.info(scriptName + " INFO: " + messageStr);
+  };
+
+  function printCount(messageStr) {
+    console.count(scriptName + " COUNT: " + messageStr);
   };
 
   function printError(messageStr) {
@@ -644,14 +648,16 @@
   }
 
   const observer = new MutationObserver(records => {
-    // console.count(scriptName + " COUNT: " + "Detected document changes");
+    // printCount("Detected document changes");
     const runProcess = () => {
       observer.disconnect();
+      // printCount("observer stop");
       if (needRework) {
         head.removeChild(css);
         markElements();
         head.appendChild(css);
         observer.observe(document, options);
+        // printCount("observer restart");
         isRunning = false;
         // printInfo("終わり");
       }
@@ -661,6 +667,9 @@
       // printInfo("始め");
       // runProcess(); // 最速
       setTimeout(() => {runProcess()}, 1000); // 間隔を指定
+    } else {
+      observer.disconnect();
+      // printCount("observer kill");
     }
   });
   observer.observe(document, options);
@@ -669,7 +678,6 @@
     window.addEventListener('load', () => {
       setTimeout(() => {
         needRework = false;
-        // printInfo("stopped");
       }, 1000);
     });
   }
