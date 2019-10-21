@@ -3,7 +3,7 @@
 // @namespace drs4gb
 // @author yzrsng
 // @description Userscript to change color on website. The performance of this script is very low.
-// @version 0.20191021.2
+// @version 0.20191021.3
 // @include http://*
 // @include https://*
 // @grant none
@@ -235,19 +235,19 @@
     ["rebeccapurple", "rgb(102, 51, 153)"] // CSS4
   ]; // https://developer.mozilla.org/ja/docs/Web/CSS/color_value
 
-  function printInfo(messageStr) {
+  const printInfo = (messageStr) => {
     console.info(scriptName + " INFO: " + messageStr);
   };
 
-  function printCount(messageStr) {
+  const printCount = (messageStr) => {
     console.count(scriptName + " COUNT: " + messageStr);
   };
 
-  function printError(messageStr) {
+  const printError = (messageStr) => {
     console.error(scriptName + " ERROR: " + messageStr);
   };
 
-  function returnParentsBgColor(elm) {
+  const returnParentsBgColor = (elm) => {
     const parentElmStyle = window.getComputedStyle(elm.parentNode);
     const parentElmBgColor = parentElmStyle.getPropertyValue("background-color");
     if (parentElmBgColor === "rgba(0, 0, 0, 0)") {
@@ -260,7 +260,7 @@
   }
 
   // from https://qiita.com/S__Minecraft/items/cb423553cc9a2e26c0b9
-  function replaceAll(str, before, after) {
+  const replaceAll = (str, before, after) => {
     var i = str.indexOf(before);
     if (i === -1) return str;
     var result = str.slice(0, i) + after;
@@ -273,7 +273,7 @@
     return result + str.slice(i+before.length);
   };
   
-  function rgbToHsv(rgbAry) {
+  const rgbToHsv = (rgbAry) => {
     if (rgbAry.length > 3) {
       rgbAry.length = 3;
     }
@@ -312,7 +312,7 @@
     return hsvAry;
   }
 
-  function hsvToRgb(hsvAry) {
+  const hsvToRgb = (hsvAry) => {
     const rgbAry = new Array(3);
     const hsvMax = hsvAry[2];
     const hsvMin = hsvMax - Math.round(hsvAry[1] / 255 * hsvMax);
@@ -351,7 +351,7 @@
     return rgbAry;
   }
 
-  function ToNumForDecClr(clrAry) {
+  const ToNumForDecClr = (clrAry) => {
     const numAry = new Array(3);
     for (let i = 0; i < 3; i++) {
       numAry[i] = parseInt(clrAry[i], 10);
@@ -359,18 +359,29 @@
     return numAry;
   }
 
-  function toAryForDecClr(clrStr) {
+  const toAryForDecClr = (clrStr) => {
     const clrValue = clrStr.substring(clrStr.indexOf("(", 3)+1,clrStr.length-1);
     const clrArray = clrValue.split(', ');
     return clrArray;
   }
 
-  function changeAlphaColor(elmColor, alphaValue) {
+  const changeAlphaColor = (elmColor, alphaValue) => {
     const clrArray = toAryForDecClr(elmColor);
     return `rgba(${clrArray[0]}, ${clrArray[1]}, ${clrArray[2]}, ${alphaValue})`;
   }
 
-  function returnNewFrontColor(elmColor) {
+  const returnInvertColor = (elmColor) => {
+    const clrArray = toAryForDecClr(elmColor);
+    for (let i = 0; i < 3; i++) {
+      clrArray[i] = 255 - clrArray[i];
+    }
+    if (clrArray.length === 4) {
+      return `rgba(${clrArray[0]}, ${clrArray[1]}, ${clrArray[2]}, ${clrArray[3]})`;
+    }
+    return `rgb(${clrArray[0]}, ${clrArray[1]}, ${clrArray[2]})`;
+  }
+
+  const returnNewFrontColor = (elmColor) => {
     const tmpRgbArray = toAryForDecClr(elmColor);
     const hsvAry = rgbToHsv(ToNumForDecClr(tmpRgbArray));
     // 色相を変更
@@ -391,7 +402,7 @@
     return `rgb(${rgbAry[0]}, ${rgbAry[1]}, ${rgbAry[2]})`;
   };
 
-  function returnNewVisitedColor(elmColor) {
+  const returnNewVisitedColor = (elmColor) => {
     const tmpRgbArray = toAryForDecClr(elmColor);
     const hsvAry = rgbToHsv(ToNumForDecClr(tmpRgbArray));
     // 色相を変更
@@ -410,7 +421,7 @@
     return `rgb(${rgbAry[0]}, ${rgbAry[1]}, ${rgbAry[2]})`;
   };
 
-  function returnNewBackColor(elmColor) {
+  const returnNewBackColor = (elmColor) => {
     const tmpRgbArray = toAryForDecClr(elmColor);
     const hsvAry = rgbToHsv(ToNumForDecClr(tmpRgbArray));
     // 色相を変更
@@ -433,7 +444,7 @@
     return `rgb(${rgbAry[0]}, ${rgbAry[1]}, ${rgbAry[2]})`;
   };
 
-  function returnNewGradient(oldGradient) {
+  const returnNewGradient = (oldGradient) => {
     // if (oldGradient === "none") {
     //   return "none";
     // }
@@ -502,14 +513,14 @@
     return newGradient;
   }
   
-  function markChildElms(elms) {
+  const markChildElms = (elms) => {
     for (let i = 0; i < elms.length; i++) {
       elms[i].setAttribute(dataSkipMath, "");
       markChildElms(elms[i].children);
     }
   }
 
-  function markElements() {
+  const markElements = () => {
     const elms = document.getElementsByTagName('*');
     const elmsLength = elms.length;
     const existStyleAry = new Array(elmsLength);
@@ -649,27 +660,22 @@
 
   const observer = new MutationObserver(records => {
     // printCount("Detected document changes");
-    const runProcess = () => {
-      observer.disconnect();
-      // printCount("observer stop");
-      if (needRework) {
-        head.removeChild(css);
-        markElements();
-        head.appendChild(css);
-        observer.observe(document, options);
-        // printCount("observer restart");
-        isRunning = false;
-        // printInfo("終わり");
-      }
-    };
     if (isRunning === false) {
       isRunning = true;
       // printInfo("始め");
-      // runProcess(); // 最速
-      setTimeout(() => {runProcess()}, 1000); // 間隔を指定
-    } else {
-      observer.disconnect();
-      // printCount("observer kill");
+      setTimeout(() => {
+        observer.disconnect();
+        printCount("observer stop");
+        if (needRework) {
+          head.removeChild(css);
+          markElements();
+          head.appendChild(css);
+          observer.observe(document, options);
+          // printCount("observer restart");
+          isRunning = false;
+          // printInfo("終わり");
+        }
+      }, 1000); // 間隔を指定
     }
   });
   observer.observe(document, options);
