@@ -3,7 +3,7 @@
 // @namespace drs4gb
 // @author yzrsng
 // @description Userscript to change color on website. The performance of this script is very low.
-// @version 0.20191021.3
+// @version 0.20191021.4
 // @include http://*
 // @include https://*
 // @grant none
@@ -26,7 +26,6 @@
   // const commonDataName = `data-${cssId}`;
   // const commonCssVariableName = `--${cssId}`;
 
-  const dataSkipMath = `data-${cssId}-math`;
   const dataEnableFcolorVisited = `data-${cssId}-enable-fcolor-visited`;
   const dataEnableTextShadow = `data-${cssId}-enable-textshadow`;
 
@@ -512,58 +511,85 @@
     }
     return newGradient;
   }
-  
-  const markChildElms = (elms) => {
-    for (let i = 0; i < elms.length; i++) {
-      elms[i].setAttribute(dataSkipMath, "");
-      markChildElms(elms[i].children);
+
+  const returnNextCheckElement = (currentElm) => {
+    if (currentElm.tagName === "HTML") {
+      return currentElm;
     }
+    return (currentElm.nextElementSibling ? currentElm.nextElementSibling : returnNextCheckElement(currentElm.parentElement));
   }
 
   const markElements = () => {
     const elms = document.getElementsByTagName('*');
     const elmsLength = elms.length;
+
+    let isSkip = false;
+    let nextElement = elms[0];
+
+    // get exist style
     const existStyleAry = new Array(elmsLength);
+    const existStyleAryLength = 8;
     for (let i = 0; i < elmsLength; i++) {
-      existStyleAry[i] = new Array(6);
-      for (let j = 0; j < existStyleAry[i].length; j++) {
+      const elmTagName = elms[i].tagName;
+      existStyleAry[i] = new Array(existStyleAryLength);
+      for (let j = 0; j < existStyleAryLength; j++) {
         existStyleAry[i][j] = false;
       }
-      const elmStyle = window.getComputedStyle(elms[i], null);
-      existStyleAry[i][0] = elms[i].tagName;
-      existStyleAry[i][1] = elmStyle.getPropertyValue("color");
-      existStyleAry[i][2] = elmStyle.getPropertyValue("background-color");
-      existStyleAry[i][3] = elmStyle.getPropertyValue("background-image");
-      existStyleAry[i][4] = elmStyle.getPropertyValue("filter");
-      const elmTagName = existStyleAry[i][0];
-      if (elmTagName === 'IMG' && existStyleAry[i][2] === "rgba(0, 0, 0, 0)") {
-        existStyleAry[i][5] = returnParentsBgColor(elms[i]);
-      } else if (existStyleAry[i][3].indexOf("url(") !== -1 && existStyleAry[i][2] === "rgba(0, 0, 0, 0)" && elmTagName !== "HTML" && elmTagName !== "BODY") {
-        existStyleAry[i][5] = returnParentsBgColor(elms[i]);
+      if (isSkip) {
+        if (elms[i] !== nextElement) {
+          continue;
+        }
+        isSkip = false;
       }
-    }
-    for (let i = 0; i < elmsLength; i++) {
-      const elmTagName = existStyleAry[i][0];
       if (elmTagName === "LINK" || elmTagName === "META" || elmTagName === "SCRIPT" || elmTagName === "NOSCRIPT" || elmTagName === "STYLE" || elmTagName === "HEAD" || elmTagName === "TITLE") {
         continue;
       }
-      if (elms[i].hasAttribute(dataSkipMath)) {
-        continue;
-      }
       if (elmTagName === "math") {
-        elms[i].setAttribute(dataSkipMath, "");
-        markChildElms(elms[i].children);
+        isSkip = true;
+        nextElement = returnNextCheckElement(elms[i]);
         continue;
       }
+      existStyleAry[i][0] = elmTagName;
+      
+      const elmStyle = window.getComputedStyle(elms[i], null);
+      // const elmStyleBefore = window.getComputedStyle(elms[i], '::before');
+      // const elmStyleAfter = window.getComputedStyle(elms[i], '::after');
       // const styleDisplay = elmStyle.getPropertyValue("display");
       // if (styleDisplay === "none") { // cssの@によるスタイル変更に対応できない
       //   continue;
       // }
+      const styleFcolor = elmStyle.getPropertyValue("color");
+      const styleBgColor = elmStyle.getPropertyValue("background-color");
+      const styleBgimage = elmStyle.getPropertyValue("background-image");
+      // const styleBgimageBefore = elmStyleBefore.getPropertyValue("background-image");
+      // const styleBgimageAfter = elmStyleAfter.getPropertyValue("background-image");
+      const styleFilter = elmStyle.getPropertyValue("filter");
+      existStyleAry[i][1] = styleFcolor;
+      existStyleAry[i][2] = styleBgColor;
+      existStyleAry[i][3] = styleBgimage;
+      // existStyleAry[i][4] = styleBgimageBefore;
+      // existStyleAry[i][5] = styleBgimageAfter;
+      existStyleAry[i][6] = styleFilter;
+      if (elmTagName === 'IMG' && styleBgColor === "rgba(0, 0, 0, 0)") {
+        existStyleAry[i][7] = returnParentsBgColor(elms[i]);
+      } else if (styleBgimage.indexOf("url(") !== -1 && styleBgColor === "rgba(0, 0, 0, 0)" && elmTagName !== "HTML" && elmTagName !== "BODY") {
+        existStyleAry[i][7] = returnParentsBgColor(elms[i]);
+      }
+    }
+    
+    // set new style
+    for (let i = 0; i < elmsLength; i++) {
+      if (existStyleAry[i][0] === false) {
+        continue;
+      }
+      const elmTagName = existStyleAry[i][0];
       const styleFcolor = existStyleAry[i][1];
       const styleBgColor = existStyleAry[i][2];
       const styleBgimage = existStyleAry[i][3];
-      const styleFilter = existStyleAry[i][4];
-      let originFilterColor = existStyleAry[i][5];
+      // const styleBgimageBefore = existStyleAry[i][4];
+      // const styleBgimageAfter = existStyleAry[i][5];
+      const styleFilter = existStyleAry[i][6];
+      let originFilterColor = existStyleAry[i][7];
       // 背景色
       if (elms[i].hasAttribute(dataOriginBgcolor) && styleBgColor !== elms[i].getAttribute(dataOriginBgcolor) || styleBgColor !== 'rgba(0, 0, 0, 0)') {
         elms[i].style.setProperty(cssVariableBgcolor, returnNewBackColor(styleBgColor));
@@ -665,7 +691,7 @@
       // printInfo("始め");
       setTimeout(() => {
         observer.disconnect();
-        printCount("observer stop");
+        // printCount("observer stop");
         if (needRework) {
           head.removeChild(css);
           markElements();
