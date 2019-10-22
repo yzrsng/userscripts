@@ -3,7 +3,7 @@
 // @namespace drs4gb
 // @author yzrsng
 // @description Userscript to change color on website. The performance of this script is very low.
-// @version 0.20191021.4
+// @version 0.20191022.1
 // @include http://*
 // @include https://*
 // @grant none
@@ -369,32 +369,36 @@
     return `rgba(${clrArray[0]}, ${clrArray[1]}, ${clrArray[2]}, ${alphaValue})`;
   }
 
-  const returnInvertColor = (elmColor) => {
-    const clrArray = toAryForDecClr(elmColor);
-    for (let i = 0; i < 3; i++) {
-      clrArray[i] = 255 - clrArray[i];
-    }
-    if (clrArray.length === 4) {
-      return `rgba(${clrArray[0]}, ${clrArray[1]}, ${clrArray[2]}, ${clrArray[3]})`;
-    }
-    return `rgb(${clrArray[0]}, ${clrArray[1]}, ${clrArray[2]})`;
-  }
+  // const returnInvertColor = (elmColor) => {
+  //   const clrArray = toAryForDecClr(elmColor);
+  //   for (let i = 0; i < 3; i++) {
+  //     clrArray[i] = 255 - clrArray[i];
+  //   }
+  //   if (clrArray.length === 4) {
+  //     return `rgba(${clrArray[0]}, ${clrArray[1]}, ${clrArray[2]}, ${clrArray[3]})`;
+  //   }
+  //   return `rgb(${clrArray[0]}, ${clrArray[1]}, ${clrArray[2]})`;
+  // }
 
   const returnNewFrontColor = (elmColor) => {
     const tmpRgbArray = toAryForDecClr(elmColor);
-    const hsvAry = rgbToHsv(ToNumForDecClr(tmpRgbArray));
-    // 色相を変更
-    if (hsvAry[0] <= 360) { // Hueは360以下が正常
-      hsvAry[0] -= 15;
-      if (hsvAry[0] < 0) {
-        hsvAry[0] += 360;
-      }
-    }
-    hsvAry[1] += Math.round((16 - hsvAry[1]) * 1 / 3); // 鮮やかさ
-    // hsvAry[1] = Math.round((hsvAry[1])*hsvAry[2] / 255); // 鮮やかさ
-    hsvAry[2] += Math.round((255 - hsvAry[2]) * 3 / 4); // 明るさ
+    const oldHsvAry = rgbToHsv(ToNumForDecClr(tmpRgbArray));
+    const newHsvAry = [].concat(oldHsvAry);
 
-    const rgbAry = hsvToRgb(hsvAry);
+    // change color
+    if (newHsvAry[0] <= 360) { // Hueは360以下が正常
+      newHsvAry[0] -= 15;
+      if (newHsvAry[0] < 0) {
+        newHsvAry[0] += 360;
+      }
+      newHsvAry[1] += Math.round((16 - newHsvAry[1]) * 1 / 3); // 鮮やかさ
+    } else {
+      newHsvAry[0] = 20;
+      newHsvAry[1] = 5;
+    }
+    newHsvAry[2] += Math.round((255 - newHsvAry[2]) * 7 / 8); // 明るさ
+
+    const rgbAry = hsvToRgb(newHsvAry);
     if (tmpRgbArray.length === 4) {
       return `rgba(${rgbAry[0]}, ${rgbAry[1]}, ${rgbAry[2]}, ${tmpRgbArray[3]})`;
     }
@@ -403,17 +407,19 @@
 
   const returnNewVisitedColor = (elmColor) => {
     const tmpRgbArray = toAryForDecClr(elmColor);
-    const hsvAry = rgbToHsv(ToNumForDecClr(tmpRgbArray));
-    // 色相を変更
-    if (hsvAry[0] <= 360) { // Hueは360以下が正常
-      hsvAry[0] -= 330;
-      if (hsvAry[0] < 0) {
-        hsvAry[0] += 360;
+    const oldHsvAry = rgbToHsv(ToNumForDecClr(tmpRgbArray));
+    const newHsvAry = [].concat(oldHsvAry);
+
+    // change color
+    if (newHsvAry[0] <= 360) { // Hueは360以下が正常
+      newHsvAry[0] -= 340;
+      if (newHsvAry[0] < 0) {
+        newHsvAry[0] += 360;
       }
     }
-    hsvAry[2] = Math.round(hsvAry[2] * 3 / 4); // 明るさ
+    newHsvAry[2] = Math.round(newHsvAry[2] * 7 / 8); // 明るさ
 
-    const rgbAry = hsvToRgb(hsvAry);
+    const rgbAry = hsvToRgb(newHsvAry);
     if (tmpRgbArray.length === 4) {
       return `rgba(${rgbAry[0]}, ${rgbAry[1]}, ${rgbAry[2]}, ${tmpRgbArray[3]})`;
     }
@@ -422,21 +428,22 @@
 
   const returnNewBackColor = (elmColor) => {
     const tmpRgbArray = toAryForDecClr(elmColor);
-    const hsvAry = rgbToHsv(ToNumForDecClr(tmpRgbArray));
-    // 色相を変更
-    if (hsvAry[0] <= 360) { // Hueは360以下が正常
-      hsvAry[0] -= 345;
-      if (hsvAry[0] < 0) {
-        hsvAry[0] += 360;
-      }
-    }
-    // hsvAry[1] += Math.round((16 - hsvAry[1]) * 1 / 3); // 鮮やかさ
-    // hsvAry[2] += Math.round((0 - hsvAry[2]) * 7 / 8); // 明るさ
-    hsvAry[2] = Math.round(hsvAry[1] * hsvAry[2] / 255);
-    // hsvAry[1] = Math.round(hsvAry[1] ** 2 / 255);
-    hsvAry[1] += Math.round((128 - hsvAry[1]) * 1 / 3); // 鮮やかさ
+    const oldHsvAry = rgbToHsv(ToNumForDecClr(tmpRgbArray));
+    const newHsvAry = [].concat(oldHsvAry);
 
-    const rgbAry = hsvToRgb(hsvAry);
+    // change color
+    if (newHsvAry[0] <= 360) { // Hueは360以下が正常
+      newHsvAry[0] -= 345;
+      if (newHsvAry[0] < 0) {
+        newHsvAry[0] += 360;
+      }
+    } else {
+      newHsvAry[1] = Math.round(128 - (127 - newHsvAry[2]) ** 2 / 128);
+    }
+    newHsvAry[2] = Math.round(newHsvAry[1] * newHsvAry[2] / 255);
+    newHsvAry[1] += Math.round((128 - newHsvAry[1]) * 1 / 3); // 鮮やかさ
+
+    const rgbAry = hsvToRgb(newHsvAry);
     if (tmpRgbArray.length === 4) {
       return `rgba(${rgbAry[0]}, ${rgbAry[1]}, ${rgbAry[2]}, ${tmpRgbArray[3]})`;
     }
@@ -448,7 +455,8 @@
     //   return "none";
     // }
     let tmpGradient = oldGradient;
-    for (let i = 0; i < cssColorNamesTable.length; i++) {
+    const cssColorNamesTableLength = cssColorNamesTable.length;
+    for (let i = 0; i < cssColorNamesTableLength; i++) {
       tmpGradient = replaceAll(tmpGradient, cssColorNamesTable[i][0], cssColorNamesTable[i][1]);
     }
     // 一度認識できる色をすべて配列にまとめる
@@ -468,42 +476,43 @@
         break;
       }
     }
-    const rgbStrs = [];
-    for (let i = 0; i < posDecClrStart.length; i++) {
-      rgbStrs.push(tmpGradient.substring(posDecClrStart[i], posDecClrEnd[i]));
+    const rgbStrsLength = posDecClrStart.length;
+    const rgbStrs =  new Array(rgbStrsLength);
+    for (let i = 0; i < rgbStrsLength; i++) {
+      rgbStrs[i] = tmpGradient.substring(posDecClrStart[i], posDecClrEnd[i]);
     }
-    const hsvStrs = [];
-    for (let i = 0; i < rgbStrs.length; i++) {
+    const hsvStrs = new Array(rgbStrsLength);
+    for (let i = 0; i < rgbStrsLength; i++) {
       const tmpRgbArray = toAryForDecClr(rgbStrs[i]);
-      const hsvAry = rgbToHsv(ToNumForDecClr(tmpRgbArray));
-      // 色相を変更
-      if (hsvAry[0] <= 360) { // Hueは360以下が正常
-        hsvAry[0] -= 345;
-        if (hsvAry[0] < 0) {
-          hsvAry[0] += 360;
+      const oldHsvAry = rgbToHsv(ToNumForDecClr(tmpRgbArray));
+      const newHsvAry = [].concat(oldHsvAry);
+
+      // change color
+      if (newHsvAry[0] <= 360) { // Hueは360以下が正常
+        newHsvAry[0] -= 345;
+        if (newHsvAry[0] < 0) {
+          newHsvAry[0] += 360;
         }
-      }
-      hsvAry[2] = Math.round(hsvAry[1] * hsvAry[2] / 255);
-      hsvAry[1] += Math.round((128 - hsvAry[1]) * 1 / 3); // 鮮やかさ
-      
-      const rgbAry = hsvToRgb(hsvAry);
-      if (tmpRgbArray.length === 4) {
-        hsvStrs.push(`rgba(${rgbAry[0]}, ${rgbAry[1]}, ${rgbAry[2]}, ${tmpRgbArray[3]})`);
       } else {
-        hsvStrs.push(`rgb(${rgbAry[0]}, ${rgbAry[1]}, ${rgbAry[2]})`);
+        newHsvAry[1] = Math.round(128 - (127 - newHsvAry[2]) ** 2 / 128);
       }
-    }
-    if (hsvStrs.length !== posDecClrStart.length || hsvStrs.length !== posDecClrEnd.length) {
-      printError("配列の長さが違う");
-      return oldGradient;
+      newHsvAry[2] = Math.round(newHsvAry[1] * newHsvAry[2] / 255);
+      newHsvAry[1] += Math.round((128 - newHsvAry[1]) * 1 / 3); // 鮮やかさ
+      
+      const rgbAry = hsvToRgb(newHsvAry);
+      if (tmpRgbArray.length === 4) {
+        hsvStrs[i] = `rgba(${rgbAry[0]}, ${rgbAry[1]}, ${rgbAry[2]}, ${tmpRgbArray[3]})`;
+      } else {
+        hsvStrs[i] = `rgb(${rgbAry[0]}, ${rgbAry[1]}, ${rgbAry[2]})`;
+      }
     }
     let newGradient = '';
-    for (let i = 0; i < hsvStrs.length; i++) {
+    for (let i = 0; i < rgbStrsLength; i++) {
       if (i === 0) {
         newGradient = tmpGradient.substring(0, posDecClrStart[i]);
       }
       newGradient += hsvStrs[i];
-      if (i === hsvStrs.length - 1) {
+      if (i === rgbStrsLength - 1) {
         newGradient += tmpGradient.substring(posDecClrEnd[i], tmpGradient.length);
       } else {
         newGradient += tmpGradient.substring(posDecClrEnd[i], posDecClrStart[i + 1]);
