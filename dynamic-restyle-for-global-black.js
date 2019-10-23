@@ -3,7 +3,7 @@
 // @namespace drs4gb
 // @author yzrsng
 // @description Userscript to change color on website. The performance of this script is very low.
-// @version 0.20191022.1
+// @version 0.20191023.1
 // @include http://*
 // @include https://*
 // @grant none
@@ -581,7 +581,7 @@
       existStyleAry[i][6] = styleFilter;
       if (elmTagName === 'IMG' && styleBgColor === "rgba(0, 0, 0, 0)") {
         existStyleAry[i][7] = returnParentsBgColor(elms[i]);
-      } else if (styleBgimage.indexOf("url(") !== -1 && styleBgColor === "rgba(0, 0, 0, 0)" && elmTagName !== "HTML" && elmTagName !== "BODY") {
+      } else if (styleBgimage.includes("url(") && styleBgColor === "rgba(0, 0, 0, 0)" && elmTagName !== "HTML" && elmTagName !== "BODY") {
         existStyleAry[i][7] = returnParentsBgColor(elms[i]);
       }
     }
@@ -624,7 +624,7 @@
         continue;
       }
       // 背景画像を装飾
-      if (styleBgimage.indexOf("url(") !== -1) {
+      if (styleBgimage.includes("url(")) {
         if (elmTagName === "HTML" || elmTagName === "BODY") {
           if (!elms[i].hasAttribute(dataEnableTextShadow)) {
             elms[i].setAttribute(dataEnableTextShadow, "");
@@ -649,14 +649,14 @@
       }
       // 背景グラデーション
       if (elms[i].hasAttribute(dataOriginBgimage) && styleBgimage !== elms[i].getAttribute(dataOriginBgimage)) {
-        if (styleBgimage.indexOf("-gradient(") !== -1) {
+        if (styleBgimage.includes("-gradient(")) {
           elms[i].style.setProperty(cssVariableBgimage, returnNewGradient(styleBgimage));
           elms[i].setAttribute(dataOriginBgimage, styleBgimage);
         } else {
           elms[i].removeAttribute(dataOriginBgimage);
           elms[i].style.setProperty(cssVariableBgimage, '');
         }
-      } else if (styleBgimage.indexOf("-gradient(") !== -1) {
+      } else if (styleBgimage.includes("-gradient(")) {
         elms[i].style.setProperty(cssVariableBgimage, returnNewGradient(styleBgimage));
         elms[i].setAttribute(dataOriginBgimage, styleBgimage);
       } else if (styleBgimage !== "none") { // 背景が画像の要素とその子孫要素に縁取り
@@ -715,7 +715,7 @@
   });
   observer.observe(document, options);
   
-  if (window.navigator.userAgent.indexOf("Android") !== -1) {
+  if (window.navigator.userAgent.includes("Android")) {
     window.addEventListener('load', () => {
       setTimeout(() => {
         needRework = false;
