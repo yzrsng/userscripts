@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name Dynamic Restyle Script for Global Black
-// @namespace drs4gb
+// @namespace https://github.com/yzrsng/userscripts
 // @author yzrsng
 // @description Userscript to change color on website. The performance of this script is very low.
-// @version 0.20191023.1
+// @version 0.20191024.1
 // @include http://*
 // @include https://*
 // @grant none
@@ -260,10 +260,10 @@
 
   // from https://qiita.com/S__Minecraft/items/cb423553cc9a2e26c0b9
   const replaceAll = (str, before, after) => {
-    var i = str.indexOf(before);
+    let i = str.indexOf(before);
     if (i === -1) return str;
-    var result = str.slice(0, i) + after;
-    var j = str.indexOf(before, i+before.length);
+    let result = str.slice(0, i) + after;
+    let j = str.indexOf(before, i+before.length);
     while (j !== -1) {
       result += str.slice(i+before.length, j) + after;
       i = j;
@@ -284,9 +284,8 @@
     const rgbMin = Math.min(...rgbAry);
     const hsvAry = new Array(3);
 
-    const calcHuePart = (clr1, clr2) => {
-      return 60 * (clr1 - clr2) / (rgbMax - rgbMin);
-    };
+    const calcHuePart = (clr1, clr2) => 60 * (clr1 - clr2) / (rgbMax - rgbMin);
+
     if (rgbAry[0] === rgbAry[1] && rgbAry[0] === rgbAry[2]) {
       hsvAry[0] = 361; // 未定義のため異常な数値を代入
     } else if (rgbAry[0] >= rgbAry[1] && rgbAry[0] >= rgbAry[2]) {
@@ -350,7 +349,7 @@
     return rgbAry;
   }
 
-  const ToNumForDecClr = (clrAry) => {
+  const toNumForDecClr = (clrAry) => {
     const numAry = new Array(3);
     for (let i = 0; i < 3; i++) {
       numAry[i] = parseInt(clrAry[i], 10);
@@ -359,7 +358,7 @@
   }
 
   const toAryForDecClr = (clrStr) => {
-    const clrValue = clrStr.substring(clrStr.indexOf("(", 3)+1,clrStr.length-1);
+    const clrValue = clrStr.substring(clrStr.indexOf("(", 3)+1, clrStr.length-1);
     const clrArray = clrValue.split(', ');
     return clrArray;
   }
@@ -370,7 +369,7 @@
   }
 
   // const returnInvertColor = (elmColor) => {
-  //   const clrArray = toAryForDecClr(elmColor);
+  //   const clrArray = toNumForDecClr(toAryForDecClr(elmColor));
   //   for (let i = 0; i < 3; i++) {
   //     clrArray[i] = 255 - clrArray[i];
   //   }
@@ -382,7 +381,7 @@
 
   const returnNewFrontColor = (elmColor) => {
     const tmpRgbArray = toAryForDecClr(elmColor);
-    const oldHsvAry = rgbToHsv(ToNumForDecClr(tmpRgbArray));
+    const oldHsvAry = rgbToHsv(toNumForDecClr(tmpRgbArray));
     const newHsvAry = [].concat(oldHsvAry);
 
     // change color
@@ -407,7 +406,7 @@
 
   const returnNewVisitedColor = (elmColor) => {
     const tmpRgbArray = toAryForDecClr(elmColor);
-    const oldHsvAry = rgbToHsv(ToNumForDecClr(tmpRgbArray));
+    const oldHsvAry = rgbToHsv(toNumForDecClr(tmpRgbArray));
     const newHsvAry = [].concat(oldHsvAry);
 
     // change color
@@ -428,7 +427,7 @@
 
   const returnNewBackColor = (elmColor) => {
     const tmpRgbArray = toAryForDecClr(elmColor);
-    const oldHsvAry = rgbToHsv(ToNumForDecClr(tmpRgbArray));
+    const oldHsvAry = rgbToHsv(toNumForDecClr(tmpRgbArray));
     const newHsvAry = [].concat(oldHsvAry);
 
     // change color
@@ -464,27 +463,28 @@
     let posRgbTmp = tmpGradient.indexOf("rgb");
     const posDecClrStart = [];
     const posDecClrEnd = [];
-    let loopCount = 0;
-    while (posRgbTmp !== -1) {
+    const loopLimit = 100; // safety
+    for (let i = 0; i <= loopLimit; i++) {
+      if (posRgbTmp === -1) {
+        break;
+      }
       posDecClrStart.push(posRgbTmp);
-      posDecClrEnd.push(tmpGradient.indexOf(")", posDecClrStart[loopCount]+11)+1);
-      posRgbTmp = tmpGradient.indexOf("rgb", posDecClrEnd[loopCount]);
-      loopCount++;
-      if (loopCount > 50) {
+      posDecClrEnd.push(tmpGradient.indexOf(")", posDecClrStart[i] + 11) + 1);
+      posRgbTmp = tmpGradient.indexOf("rgb", posDecClrEnd[i]);
+      if (i >= loopLimit) {
         printError("Infinity Loop on analyze gradient.");
-        loopCount = 0;
         break;
       }
     }
     const rgbStrsLength = posDecClrStart.length;
-    const rgbStrs =  new Array(rgbStrsLength);
+    const rgbStrs = new Array(rgbStrsLength);
     for (let i = 0; i < rgbStrsLength; i++) {
       rgbStrs[i] = tmpGradient.substring(posDecClrStart[i], posDecClrEnd[i]);
     }
     const hsvStrs = new Array(rgbStrsLength);
     for (let i = 0; i < rgbStrsLength; i++) {
       const tmpRgbArray = toAryForDecClr(rgbStrs[i]);
-      const oldHsvAry = rgbToHsv(ToNumForDecClr(tmpRgbArray));
+      const oldHsvAry = rgbToHsv(toNumForDecClr(tmpRgbArray));
       const newHsvAry = [].concat(oldHsvAry);
 
       // change color
@@ -542,7 +542,7 @@
       const elmTagName = elms[i].tagName;
       existStyleAry[i] = new Array(existStyleAryLength);
       for (let j = 0; j < existStyleAryLength; j++) {
-        existStyleAry[i][j] = false;
+        existStyleAry[i][j] = "";
       }
       if (isSkip) {
         if (elms[i] !== nextElement) {
@@ -588,7 +588,7 @@
     
     // set new style
     for (let i = 0; i < elmsLength; i++) {
-      if (existStyleAry[i][0] === false) {
+      if (!existStyleAry[i][0]) {
         continue;
       }
       const elmTagName = existStyleAry[i][0];
@@ -606,7 +606,7 @@
       }
       // 画像を装飾
       if (elmTagName === 'IMG') {
-        if (originFilterColor === false) {
+        if (!originFilterColor) {
           originFilterColor = styleBgColor;
         }
         if (!elms[i].hasAttribute(dataOriginFilterColor) || originFilterColor !== elms[i].getAttribute(dataOriginFilterColor)) {
@@ -631,7 +631,7 @@
           }
           continue;
         }
-        if (originFilterColor === false) {
+        if (!originFilterColor) {
           originFilterColor = styleBgColor;
         }
         if (!elms[i].hasAttribute(dataOriginFilterColor) || originFilterColor !== elms[i].getAttribute(dataOriginFilterColor)) {
@@ -693,19 +693,19 @@
     subtree: true
   }
 
-  const observer = new MutationObserver(records => {
+  const observer = new MutationObserver((records, obs) => {
     // printCount("Detected document changes");
     if (isRunning === false) {
       isRunning = true;
       // printInfo("始め");
       setTimeout(() => {
-        observer.disconnect();
+        obs.disconnect();
         // printCount("observer stop");
         if (needRework) {
           head.removeChild(css);
           markElements();
           head.appendChild(css);
-          observer.observe(document, options);
+          obs.observe(document, options);
           // printCount("observer restart");
           isRunning = false;
           // printInfo("終わり");
