@@ -19,7 +19,7 @@
 背景色の変化で画像が判別できなくなると困るので後光が指すようにした。
 */
 
-(function(){
+(function () {
   'use strict';
   const scriptName = "drs4gb";
   const cssId = `userscript-${scriptName}`;
@@ -46,7 +46,7 @@
   const css = document.createElement('style');
   css.type = "text/css";
   css.id = cssId;
-  css.insertAdjacentHTML('beforeend', String.raw`
+  css.insertAdjacentHTML('beforeend', String.raw `
 :root {
   background-color: black;
 }
@@ -256,22 +256,23 @@
       return returnParentsBgColor(elm.parentNode);
     }
     return parentElmBgColor;
-  }
+  };
 
   // from https://qiita.com/S__Minecraft/items/cb423553cc9a2e26c0b9
   const replaceAll = (str, before, after) => {
     let i = str.indexOf(before);
-    if (i === -1) return str;
+    if (i === -1)
+      return str;
     let result = str.slice(0, i) + after;
-    let j = str.indexOf(before, i+before.length);
+    let j = str.indexOf(before, i + before.length);
     while (j !== -1) {
-      result += str.slice(i+before.length, j) + after;
+      result += str.slice(i + before.length, j) + after;
       i = j;
-      j = str.indexOf(before, i+before.length);
+      j = str.indexOf(before, i + before.length);
     }
-    return result + str.slice(i+before.length);
+    return result + str.slice(i + before.length);
   };
-  
+
   const rgbToHsv = (rgbAry) => {
     if (rgbAry.length > 3) {
       rgbAry.length = 3;
@@ -288,13 +289,17 @@
 
     if (rgbAry[0] === rgbAry[1] && rgbAry[0] === rgbAry[2]) {
       hsvAry[0] = 361; // 未定義のため異常な数値を代入
-    } else if (rgbAry[0] >= rgbAry[1] && rgbAry[0] >= rgbAry[2]) {
+    }
+    else if (rgbAry[0] >= rgbAry[1] && rgbAry[0] >= rgbAry[2]) {
       hsvAry[0] = calcHuePart(rgbAry[1], rgbAry[2]);
-    } else if (rgbAry[1] >= rgbAry[0] && rgbAry[1] >= rgbAry[2]) {
+    }
+    else if (rgbAry[1] >= rgbAry[0] && rgbAry[1] >= rgbAry[2]) {
       hsvAry[0] = calcHuePart(rgbAry[2], rgbAry[0]) + 120;
-    } else if (rgbAry[2] >= rgbAry[0] && rgbAry[2] >= rgbAry[1]) {
+    }
+    else if (rgbAry[2] >= rgbAry[0] && rgbAry[2] >= rgbAry[1]) {
       hsvAry[0] = calcHuePart(rgbAry[0], rgbAry[1]) + 240;
-    } else {
+    }
+    else {
       printError("RGBからHSVへの変換のHの計算で意図しない動作");
       hsvAry[0] = 362;
     }
@@ -303,12 +308,13 @@
     }
     if (rgbMax === 0) { // 0除算エラー防止
       hsvAry[1] = 0;
-    } else {
+    }
+    else {
       hsvAry[1] = (rgbMax - rgbMin) * 255 / rgbMax;
     }
     hsvAry[2] = rgbMax;
     return hsvAry;
-  }
+  };
 
   const hsvToRgb = (hsvAry) => {
     const rgbAry = new Array(3);
@@ -318,36 +324,43 @@
       rgbAry[0] = hsvMax;
       rgbAry[1] = hsvMax;
       rgbAry[2] = hsvMax;
-    } else if (0 <= hsvAry[0] && hsvAry[0] <= 60) {
+    }
+    else if (0 <= hsvAry[0] && hsvAry[0] <= 60) {
       rgbAry[0] = hsvMax;
       rgbAry[1] = Math.round(hsvAry[0] / 60 * (hsvMax - hsvMin)) + hsvMin;
       rgbAry[2] = hsvMin;
-    } else if (60 < hsvAry[0] && hsvAry[0] <= 120) {
+    }
+    else if (60 < hsvAry[0] && hsvAry[0] <= 120) {
       rgbAry[0] = Math.round((120 - hsvAry[0]) / 60 * (hsvMax - hsvMin)) + hsvMin;
       rgbAry[1] = hsvMax;
       rgbAry[2] = hsvMin;
-    } else if (120 < hsvAry[0] && hsvAry[0] <= 180) {
+    }
+    else if (120 < hsvAry[0] && hsvAry[0] <= 180) {
       rgbAry[0] = hsvMin;
       rgbAry[1] = hsvMax;
       rgbAry[2] = Math.round((hsvAry[0] - 120) / 60 * (hsvMax - hsvMin)) + hsvMin;
-    } else if (180 < hsvAry[0] && hsvAry[0] <= 240) {
+    }
+    else if (180 < hsvAry[0] && hsvAry[0] <= 240) {
       rgbAry[0] = hsvMin;
       rgbAry[1] = Math.round((240 - hsvAry[0]) / 60 * (hsvMax - hsvMin)) + hsvMin;
       rgbAry[2] = hsvMax;
-    } else if (240 < hsvAry[0] && hsvAry[0] <= 300) {
+    }
+    else if (240 < hsvAry[0] && hsvAry[0] <= 300) {
       rgbAry[0] = Math.round((hsvAry[0] - 240) / 60 * (hsvMax - hsvMin)) + hsvMin;
       rgbAry[1] = hsvMin;
       rgbAry[2] = hsvMax;
-    } else if (300 < hsvAry[0] && hsvAry[0] <= 360) {
+    }
+    else if (300 < hsvAry[0] && hsvAry[0] <= 360) {
       rgbAry[0] = hsvMax;
       rgbAry[1] = hsvMin;
       rgbAry[2] = Math.round((360 - hsvAry[0]) / 60 * (hsvMax - hsvMin)) + hsvMin;
-    } else {
+    }
+    else {
       printError("HSVからRGBへの変換で意図しない動作");
       rgbAry[0] = rgbAry[1] = rgbAry[2] = 0;
     }
     return rgbAry;
-  }
+  };
 
   const toNumForDecClr = (clrAry) => {
     const numAry = new Array(3);
@@ -355,18 +368,18 @@
       numAry[i] = parseInt(clrAry[i], 10);
     }
     return numAry;
-  }
+  };
 
   const toAryForDecClr = (clrStr) => {
-    const clrValue = clrStr.substring(clrStr.indexOf("(", 3)+1, clrStr.length-1);
+    const clrValue = clrStr.substring(clrStr.indexOf("(", 3) + 1, clrStr.length - 1);
     const clrArray = clrValue.split(', ');
     return clrArray;
-  }
+  };
 
   const changeAlphaColor = (elmColor, alphaValue) => {
     const clrArray = toAryForDecClr(elmColor);
     return `rgba(${clrArray[0]}, ${clrArray[1]}, ${clrArray[2]}, ${alphaValue})`;
-  }
+  };
 
   // const returnInvertColor = (elmColor) => {
   //   const clrArray = toNumForDecClr(toAryForDecClr(elmColor));
@@ -377,7 +390,7 @@
   //     return `rgba(${clrArray[0]}, ${clrArray[1]}, ${clrArray[2]}, ${clrArray[3]})`;
   //   }
   //   return `rgb(${clrArray[0]}, ${clrArray[1]}, ${clrArray[2]})`;
-  // }
+  // };
 
   const returnNewFrontColor = (elmColor) => {
     const tmpRgbArray = toAryForDecClr(elmColor);
@@ -391,7 +404,8 @@
         newHsvAry[0] += 360;
       }
       newHsvAry[1] += Math.round((16 - newHsvAry[1]) * 1 / 3); // 鮮やかさ
-    } else {
+    }
+    else {
       newHsvAry[0] = 20;
       newHsvAry[1] = 5;
     }
@@ -436,7 +450,8 @@
       if (newHsvAry[0] < 0) {
         newHsvAry[0] += 360;
       }
-    } else {
+    }
+    else {
       newHsvAry[1] = Math.round(128 - (127 - newHsvAry[2]) ** 2 / 128);
     }
     newHsvAry[2] = Math.round(newHsvAry[1] * newHsvAry[2] / 255);
@@ -493,16 +508,18 @@
         if (newHsvAry[0] < 0) {
           newHsvAry[0] += 360;
         }
-      } else {
+      }
+      else {
         newHsvAry[1] = Math.round(128 - (127 - newHsvAry[2]) ** 2 / 128);
       }
       newHsvAry[2] = Math.round(newHsvAry[1] * newHsvAry[2] / 255);
       newHsvAry[1] += Math.round((128 - newHsvAry[1]) * 1 / 3); // 鮮やかさ
-      
+
       const rgbAry = hsvToRgb(newHsvAry);
       if (tmpRgbArray.length === 4) {
         hsvStrs[i] = `rgba(${rgbAry[0]}, ${rgbAry[1]}, ${rgbAry[2]}, ${tmpRgbArray[3]})`;
-      } else {
+      }
+      else {
         hsvStrs[i] = `rgb(${rgbAry[0]}, ${rgbAry[1]}, ${rgbAry[2]})`;
       }
     }
@@ -514,19 +531,20 @@
       newGradient += hsvStrs[i];
       if (i === rgbStrsLength - 1) {
         newGradient += tmpGradient.substring(posDecClrEnd[i], tmpGradient.length);
-      } else {
+      }
+      else {
         newGradient += tmpGradient.substring(posDecClrEnd[i], posDecClrStart[i + 1]);
       }
     }
     return newGradient;
-  }
+  };
 
   const returnNextCheckElement = (currentElm) => {
     if (currentElm.tagName === "HTML") {
       return currentElm;
     }
     return (currentElm.nextElementSibling ? currentElm.nextElementSibling : returnNextCheckElement(currentElm.parentElement));
-  }
+  };
 
   const markElements = () => {
     const elms = document.getElementsByTagName('*');
@@ -559,7 +577,7 @@
         continue;
       }
       existStyleAry[i][0] = elmTagName;
-      
+
       const elmStyle = window.getComputedStyle(elms[i], null);
       // const elmStyleBefore = window.getComputedStyle(elms[i], '::before');
       // const elmStyleAfter = window.getComputedStyle(elms[i], '::after');
@@ -581,11 +599,12 @@
       existStyleAry[i][6] = styleFilter;
       if (elmTagName === 'IMG' && styleBgColor === "rgba(0, 0, 0, 0)") {
         existStyleAry[i][7] = returnParentsBgColor(elms[i]);
-      } else if (styleBgimage.includes("url(") && styleBgColor === "rgba(0, 0, 0, 0)" && elmTagName !== "HTML" && elmTagName !== "BODY") {
+      }
+      else if (styleBgimage.includes("url(") && styleBgColor === "rgba(0, 0, 0, 0)" && elmTagName !== "HTML" && elmTagName !== "BODY") {
         existStyleAry[i][7] = returnParentsBgColor(elms[i]);
       }
     }
-    
+
     // set new style
     for (let i = 0; i < elmsLength; i++) {
       if (!existStyleAry[i][0]) {
@@ -617,7 +636,8 @@
           elms[i].setAttribute(dataOriginFilters, styleFilter);
           if (styleFilter === "none") {
             elms[i].style.setProperty(cssVariableOriginFilters, " ");
-          } else {
+          }
+          else {
             elms[i].style.setProperty(cssVariableOriginFilters, styleFilter);
           }
         }
@@ -642,7 +662,8 @@
           elms[i].setAttribute(dataOriginFilters, styleFilter);
           if (styleFilter === "none") {
             elms[i].style.setProperty(cssVariableOriginFilters, " ");
-          } else {
+          }
+          else {
             elms[i].style.setProperty(cssVariableOriginFilters, styleFilter);
           }
         }
@@ -652,14 +673,17 @@
         if (styleBgimage.includes("-gradient(")) {
           elms[i].style.setProperty(cssVariableBgimage, returnNewGradient(styleBgimage));
           elms[i].setAttribute(dataOriginBgimage, styleBgimage);
-        } else {
+        }
+        else {
           elms[i].removeAttribute(dataOriginBgimage);
           elms[i].style.setProperty(cssVariableBgimage, '');
         }
-      } else if (styleBgimage.includes("-gradient(")) {
+      }
+      else if (styleBgimage.includes("-gradient(")) {
         elms[i].style.setProperty(cssVariableBgimage, returnNewGradient(styleBgimage));
         elms[i].setAttribute(dataOriginBgimage, styleBgimage);
-      } else if (styleBgimage !== "none") { // 背景が画像の要素とその子孫要素に縁取り
+      }
+      else if (styleBgimage !== "none") { // 背景が画像の要素とその子孫要素に縁取り
         if (!elms[i].hasAttribute(dataEnableTextShadow)) {
           elms[i].setAttribute(dataEnableTextShadow, "");
         }
@@ -691,7 +715,7 @@
     // attributeFilter: ["class", "style"], //ほぼ全てのスタイルの変化を検知
     childList: true,
     subtree: true
-  }
+  };
 
   const observer = new MutationObserver((records, obs) => {
     // printCount("Detected document changes");
@@ -714,7 +738,7 @@
     }
   });
   observer.observe(document, options);
-  
+
   if (window.navigator.userAgent.includes("Android")) {
     window.addEventListener('load', () => {
       setTimeout(() => {
