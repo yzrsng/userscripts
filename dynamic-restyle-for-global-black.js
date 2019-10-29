@@ -19,10 +19,10 @@
 */
 (function () {
     'use strict';
-    const restyleIntervalTime = 1000; // 次の処理開始までの最短停止時間、単位はms
-    const minimumBreakTime = 5000; // 次の処理開始までの推奨停止時間、単位はms
-    const continuousWorkCountLimit = 10; // 連続で停止時間が推奨停止時間より少なくても動作する回数、超えると変更検知を停止
-    const addedWorkCountLimit = 20; // 一回のスタイル変更処理中に次の処理を追加された回数がこの値を超えると変更検知を停止
+    const RESTYLE_INTERVAL_TIME = 1000; // 次の処理開始までの最短停止時間、単位はms
+    const ENOUGH_BREAK_TIME = 5000; // 次の処理開始までの推奨停止時間、単位はms
+    const CONTINUOUS_WORK_COUNT_LIMIT = 10; // 連続で停止時間が推奨停止時間より少なくても動作する回数、超えると変更検知を停止
+    const ADDED_WORK_COUNT_LIMIT = 20; // 一回のスタイル変更処理中に次の処理を追加された回数がこの値を超えると変更検知を停止
     const head = document.getElementsByTagName('head')[0];
     const tmpCss = document.createElement('style');
     tmpCss.type = "text/css";
@@ -764,7 +764,7 @@ a:visited, a:visited * {
             //   console.log(records);
             // }
             if (isRunning === false) {
-                if (addedWorkCount > addedWorkCountLimit || continuousWorkCount > continuousWorkCountLimit) {
+                if (addedWorkCount > ADDED_WORK_COUNT_LIMIT || continuousWorkCount > CONTINUOUS_WORK_COUNT_LIMIT) {
                     needRework = false;
                     printError("observer thrown out work.\nbecause this web page changes frequently.");
                     window.alert("Observer for restyle is going to stop.\nBecause this web page changes frequently.");
@@ -774,7 +774,7 @@ a:visited, a:visited * {
                 performance.mark('breakTime:end');
                 if (isMarkedPerformanceStart) {
                     performance.measure('breakTime', 'breakTime:start', 'breakTime:end');
-                    if (performance.getEntriesByType('measure')[0].duration < minimumBreakTime) {
+                    if (performance.getEntriesByType('measure')[0].duration < ENOUGH_BREAK_TIME) {
                         continuousWorkCount++;
                     }
                     else
@@ -800,7 +800,7 @@ a:visited, a:visited * {
                         isMarkedPerformanceStart = true;
                         // console.info("終わり");
                     }
-                }, restyleIntervalTime); // 間隔を指定
+                }, RESTYLE_INTERVAL_TIME); // 間隔を指定
             }
             else {
                 addedWorkCount = 0;
