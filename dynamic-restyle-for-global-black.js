@@ -3,9 +3,11 @@
 // @name:ja        Dynamic Restyle Script for Global Black
 // @namespace      https://github.com/yzrsng/userscripts
 // @author         yzrsng
-// @version        0.20191030.2
+// @version        0.20191030.3
 // @include        http://*
 // @include        https://*
+// @include        https://twitter.com/*
+// @include        https://mobile.twitter.com/*
 // @grant          none
 // @description    Userscript to change color on website.
 // @description:ja ウェブページを動的に再装飾して黒くする
@@ -767,7 +769,7 @@ a:visited, a:visited * {
                 if (addedWorkCount > ADDED_WORK_COUNT_LIMIT || continuousWorkCount > CONTINUOUS_WORK_COUNT_LIMIT) {
                     needRework = false;
                     printError("observer thrown out work.\nbecause this web page changes frequently.");
-                    window.alert("Observer for restyle is going to stop.\nBecause this web page changes frequently.");
+                    window.alert("Observer for restyle is going to stop.\nBecause this web page changes frequently.\n\nページの変更が激しいので変更の検知を停止します。");
                 }
                 addedWorkCount++;
                 isRunning = true;
