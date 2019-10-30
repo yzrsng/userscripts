@@ -763,7 +763,7 @@ a:visited, a:visited * {
             // if (recordsLength > 0) {
             //   console.log(records);
             // }
-            if (isRunning === false) {
+            if (restyleRecords.length > 0 && isRunning === false) {
                 if (addedWorkCount > ADDED_WORK_COUNT_LIMIT || continuousWorkCount > CONTINUOUS_WORK_COUNT_LIMIT) {
                     needRework = false;
                     printError("observer thrown out work.\nbecause this web page changes frequently.");
