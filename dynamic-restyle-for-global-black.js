@@ -3,7 +3,7 @@
 // @name:ja        Dynamic Restyle Script for Global Black
 // @namespace      https://github.com/yzrsng/userscripts
 // @author         yzrsng
-// @version        0.20191030.1
+// @version        0.20191030.2
 // @include        http://*
 // @include        https://*
 // @grant          none
