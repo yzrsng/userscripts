@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name hide count twitter
-// @namespace hide-twitter-count
+// @namespace https://github.com/yzrsng/userscripts
 // @author yzrsng
 // @description Userscript for hide count on twitter.
 // @version 0.1
