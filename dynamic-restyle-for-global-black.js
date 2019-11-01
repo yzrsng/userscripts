@@ -6,12 +6,12 @@
 // @description:ja ウェブページを動的に再装飾して黒くする
 // @version        0.20191101.1
 // @author         yzrsng
+// @downloadURL    https://raw.githubusercontent.com/yzrsng/userscripts/master/dynamic-restyle-for-global-black.js
 // @include        http://*
 // @include        https://*
 // @match          *://*
 // @exclude        https://twitter.com/*
 // @exclude        https://mobile.twitter.com/*
-// @run-at         document-start
 // @grant          none
 // ==/UserScript==
 /*
