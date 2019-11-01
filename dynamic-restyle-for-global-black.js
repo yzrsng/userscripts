@@ -2,15 +2,17 @@
 // @name           Dynamic Restyle Script for Global Black
 // @name:ja        Dynamic Restyle Script for Global Black
 // @namespace      https://github.com/yzrsng/userscripts
-// @author         yzrsng
-// @version        0.20191030.4
-// @include        http://*
-// @include        https://*
-// @exclude        https://twitter.com/*
-// @exclude        https://mobile.twitter.com/*
-// @grant          none
 // @description    Userscript to change color on website.
 // @description:ja ウェブページを動的に再装飾して黒くする
+// @version        0.20191101.1
+// @author         yzrsng
+// @include        http://*
+// @include        https://*
+// @match          *://*
+// @exclude        https://twitter.com/*
+// @exclude        https://mobile.twitter.com/*
+// @run-at         document-start
+// @grant          none
 // ==/UserScript==
 /*
 ウェブページの変更を検知して動的に色を変更する。
@@ -404,7 +406,7 @@ a:visited, a:visited * {
             if (newHsvAry[0] < 0) {
                 newHsvAry[0] += 360;
             }
-            newHsvAry[1] += Math.round((16 - newHsvAry[1]) * 1 / 3); // 鮮やかさ
+            newHsvAry[1] += Math.round((32 - newHsvAry[1]) * 1 / 2); // 鮮やかさ
         }
         else {
             newHsvAry[0] = 20;
