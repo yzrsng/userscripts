@@ -12,10 +12,11 @@
 (function() {
   'use strict';
 
-  const myCss = document.createElement('style');
-  myCss.type = "text/css";
-  myCss.id = 'hide-twitter-count';
-  myCss.insertAdjacentHTML('beforeend', `
+  const hideCountTwitter = () => {
+    const myCss = document.createElement('style');
+    myCss.type = "text/css";
+    myCss.id = 'hide-twitter-count';
+    myCss.insertAdjacentHTML('beforeend', `
 a[href$="following"] > span:first-of-type,
 a[href$="followers"] > span:first-of-type,
 
@@ -27,7 +28,13 @@ div[data-testid="unretweet"] > div > div > span,
 article[role="article"] > div > div > div > a[href$="likes"] > div > span,
 article[role="article"] > div > div > div > a[href$="retweets"] > div > span {
   visibility: hidden;
-}
-`);
-  document.getElementsByTagName('head')[0].appendChild(myCss);
+}`);
+    document.getElementsByTagName('head')[0].appendChild(myCss);
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", hideCountTwitter);
+  } else {
+    hideCountTwitter();
+  }
 })();
