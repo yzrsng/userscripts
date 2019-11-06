@@ -4,7 +4,7 @@
 // @namespace      https://github.com/yzrsng/userscripts
 // @description    Userscript to change color on website.
 // @description:ja ウェブページを動的に再装飾して黒くする
-// @version        0.20191101.1
+// @version        0.20191106.1
 // @author         yzrsng
 // @downloadURL    https://raw.githubusercontent.com/yzrsng/userscripts/master/dynamic-restyle-for-global-black.js
 // @include        http://*
@@ -667,7 +667,7 @@ a:visited, a:visited * {
             let originFilterColor = existStyleAry[i][5];
             // 背景色
             if (styleBgColor.includes("rgb") && !styleBgColor.includes("rgba") || toAryForDecClr(styleBgColor)[3] !== 0) {
-                if (!restyleTargetElms[i].hasAttribute(dataOriginBgcolor) || styleBgColor !== restyleTargetElms[i].getAttribute(dataOriginBgcolor)) {
+                if (!restyleTargetElms[i].hasAttribute(dataOriginBgcolor) || styleBgColor !== restyleTargetElms[i].getAttribute(dataOriginBgcolor) && styleBgColor !== restyleTargetElms[i].style.getPropertyValue(cssVariableBgcolor)) {
                     restyleTargetElms[i].style.setProperty(cssVariableBgcolor, returnNewBackColor(styleBgColor));
                     restyleTargetElms[i].setAttribute(dataOriginBgcolor, styleBgColor);
                 }
@@ -691,6 +691,9 @@ a:visited, a:visited * {
                     }
                 }
             }
+            else if (restyleTargetElms[i].hasAttribute(dataOriginFilters)) {
+                restyleTargetElms[i].removeAttribute(dataOriginFilters);
+            }
             // else if (restyleTargetTagName === "HTML" || restyleTargetTagName === "BODY") {
             //   if (!restyleTargetElms[i].hasAttribute(dataEnableTextShadow)) {
             //     restyleTargetElms[i].setAttribute(dataEnableTextShadow, "");
@@ -699,7 +702,7 @@ a:visited, a:visited * {
             // }
             // 背景グラデーション
             if (styleBgimage.includes("-gradient(")) {
-                if (!restyleTargetElms[i].hasAttribute(dataOriginBgimage) || styleBgimage !== restyleTargetElms[i].getAttribute(dataOriginBgimage)) {
+                if (!restyleTargetElms[i].hasAttribute(dataOriginBgimage) || styleBgimage !== restyleTargetElms[i].getAttribute(dataOriginBgimage) && styleBgimage !== restyleTargetElms[i].style.getPropertyValue(cssVariableBgimage)) {
                     restyleTargetElms[i].style.setProperty(cssVariableBgimage, returnNewGradient(styleBgimage));
                     restyleTargetElms[i].setAttribute(dataOriginBgimage, styleBgimage);
                 }
@@ -716,10 +719,13 @@ a:visited, a:visited * {
                         restyleTargetElms[i].setAttribute(dataEnableTextShadow, "");
                     }
                 }
+                else if (restyleTargetElms[i].hasAttribute(dataEnableTextShadow)) {
+                    restyleTargetElms[i].removeAttribute(dataEnableTextShadow);
+                }
             }
             // 前景色
             if (styleFcolor.includes("rgb") && !styleFcolor.includes("rgba") || toAryForDecClr(styleFcolor)[3] !== 0) {
-                if (!restyleTargetElms[i].hasAttribute(dataOriginFcolor) || styleFcolor !== restyleTargetElms[i].getAttribute(dataOriginFcolor)) {
+                if (!restyleTargetElms[i].hasAttribute(dataOriginFcolor) || styleFcolor !== restyleTargetElms[i].getAttribute(dataOriginFcolor) && styleFcolor !== restyleTargetElms[i].style.getPropertyValue(cssVariableFcolor)) {
                     const newFrontColor = returnNewFrontColor(styleFcolor);
                     restyleTargetElms[i].style.setProperty(cssVariableFcolor, newFrontColor);
                     restyleTargetElms[i].setAttribute(dataOriginFcolor, styleFcolor);
