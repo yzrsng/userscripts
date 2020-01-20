@@ -71,19 +71,6 @@
 :root {
     background-color: ${cssRootBackgroundColor};
 }
-* {
-    scrollbar-color: #2a2c2e #1c1e1f;
-}
-::-webkit-scrollbar {
-    background-color: #1c1e1f;
-    color: #c5c1b9;
-}
-::-webkit-scrollbar-corner {
-    background-color: #181a1b;
-}
-::-webkit-scrollbar-thumb {
-    background-color: #2a2c2e;
-}
 [${dataOriginFcolor}], [${dataOriginFcolor}]::placeholder {
     color: var(${cssVariableFcolor}, attr(${dataOriginFcolor})) !important;
 }
