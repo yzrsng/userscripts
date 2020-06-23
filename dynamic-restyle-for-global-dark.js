@@ -4,7 +4,7 @@
 // @namespace      https://github.com/yzrsng/userscripts
 // @description    The website becomes dark.
 // @description:ja ウェブページを元のデザインに基づいて暗く装飾する
-// @version        0.20191226.1
+// @version        0.20200624.2
 // @author         yzrsng
 // @downloadURL    https://raw.githubusercontent.com/yzrsng/userscripts/master/dynamic-restyle-for-global-dark.js
 // @include        http://*
@@ -21,6 +21,15 @@
 オプション
 明るいテーマ
 背景色の変化で画像が判別できなくなると困るので後光が指すように
+
+TODO
+
+コントラストの調整
+
+個々の要素のstyle属性を改変する関数
+importantとそうでないのと(importantは対応しなくてもよい)
+
+headの小要素を監視してスタイルの変化のみを検知するobserver
 */
 (function () {
     'use strict';
@@ -1144,20 +1153,18 @@
             }
         };
         const removeOverrideStyleSheets = () => {
-            const headChildren = head.children;
-            const headChildrenLength = headChildren.length;
-            for (let i = 0; i < headChildrenLength; i++) {
-                if (headChildren[i]) {
-                    if (headChildren[i].classList.contains(cssId)) {
-                        headChildren[i].remove();
-                    }
+            const oldOverrideStyleSheets = document.getElementsByClassName(cssId);
+            const oldOverrideStyleSheetsLength = oldOverrideStyleSheets.length;
+            for (let i = 0; i < oldOverrideStyleSheetsLength; i++) {
+                if (oldOverrideStyleSheets[i]) {
+                    oldOverrideStyleSheets[i].remove();
                 }
             }
         };
         const appendOverrideStyleSheets = () => {
             const overrideStyleSheetsLength = overrideStyleSheets.length;
             for (let i = 0; i < overrideStyleSheetsLength; i++) {
-                if (isInNode(existStyleSheets[i], head)) {
+                if (isInNode(existStyleSheets[i], document)) {
                     existStyleSheets[i].insertAdjacentHTML("afterend", overrideStyleSheets[i]);
                 }
             }
