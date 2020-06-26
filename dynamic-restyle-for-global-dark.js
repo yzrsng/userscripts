@@ -4,7 +4,7 @@
 // @namespace      https://github.com/yzrsng/userscripts
 // @description    The website becomes dark.
 // @description:ja ウェブページを元のデザインに基づいて暗く装飾する
-// @version        0.20200626.4
+// @version        0.20200626.5
 // @author         yzrsng
 // @downloadURL    https://raw.githubusercontent.com/yzrsng/userscripts/master/dynamic-restyle-for-global-dark.js
 // @include        http://*
@@ -285,7 +285,7 @@ importantとそうでないのと(importantは対応しなくてもよい)
                 return oldHueValue - Math.round((oldHueValue - 300) * 1 / 3);
             }
             else {
-                printError("Light Hue Error, oldHueValue : " + oldHueValue);
+                printError("Hue like CMY Error, oldHueValue : " + oldHueValue);
                 return 0;
             }
         };
@@ -309,7 +309,7 @@ importantとそうでないのと(importantは対応しなくてもよい)
                 return oldHueValue + Math.round((360 - oldHueValue) * 1 / 3);
             }
             else {
-                printError("Dark Hue Error, oldHueValue : " + oldHueValue);
+                printError("Hue like RGB Error, oldHueValue : " + oldHueValue);
                 return 0;
             }
         };
