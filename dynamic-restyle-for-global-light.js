@@ -4,7 +4,7 @@
 // @namespace      https://github.com/yzrsng/userscripts
 // @description    The website becomes light.
 // @description:ja ウェブページを元のデザインに基づいて明るく装飾する
-// @version        0.20200624.2
+// @version        0.20200626.5
 // @author         yzrsng
 // @downloadURL    https://raw.githubusercontent.com/yzrsng/userscripts/master/dynamic-restyle-for-global-light.js
 // @include        http://*
@@ -20,16 +20,15 @@
 
 オプション
 明るいテーマ
-背景色の変化で画像が判別できなくなると困るので後光が指すように
+色相を光の三原色から離す
+背景色の変化で画像が判別できなくなると困るので後光が指す
 
 TODO
-
-コントラストの調整
 
 個々の要素のstyle属性を改変する関数
 importantとそうでないのと(importantは対応しなくてもよい)
 
-headの小要素を監視してスタイルの変化のみを検知するobserver
+スタイルシートの変化のみを検知するobserver
 */
 (function () {
     'use strict';
@@ -38,6 +37,7 @@ headの小要素を監視してスタイルの変化のみを検知するobserve
     const CONTINUOUS_WORK_COUNT_LIMIT = 10; // 連続で停止時間が推奨停止時間より少なくても動作する回数、超えると変更検知を停止
     const ADDED_WORK_COUNT_LIMIT = 20; // 一回のスタイル変更処理中に次の処理を追加された回数がこの値を超えると変更検知を停止
     const scriptOptionLightStyle = true;
+    const scriptOptionColorFarFromPrimaryRGB = true; // for color blind users and others
     const scriptOptionImageFloat = false;
     const head = document.getElementsByTagName('head')[0];
     const tmpCss = document.createElement('style');
@@ -76,6 +76,22 @@ headの小要素を監視してスタイルの変化のみを検知するobserve
         dynamicCss.type = "text/css";
         dynamicCss.className = `${cssId} ${cssId}-restyle`;
         dynamicCss.media = "screen";
+        if (!scriptOptionLightStyle) {
+            dynamicCss.insertAdjacentHTML('beforeend', `
+* {
+    scrollbar-color: #2a2c2e #1c1e1f;
+}
+::-webkit-scrollbar {
+    background-color: #1c1e1f;
+    color: #c5c1b9;
+}
+::-webkit-scrollbar-corner {
+    background-color: #181a1b;
+}
+::-webkit-scrollbar-thumb {
+    background-color: #2a2c2e;
+}`);
+        }
         dynamicCss.insertAdjacentHTML('beforeend', `
 :root {
     background-color: ${cssRootBackgroundColor};
@@ -249,44 +265,94 @@ headの小要素を監視してスタイルの変化のみを検知するobserve
         //   }
         //   return `rgb(${clrArray[0]}, ${clrArray[1]}, ${clrArray[2]})`;
         // }
+        const returnHueFarFromPrimaryRGB = (oldHueValue) => {
+            if (0 <= oldHueValue && oldHueValue <= 60) {
+                return oldHueValue + Math.round((60 - oldHueValue) * 1 / 3);
+            }
+            else if (oldHueValue <= 120) {
+                return oldHueValue - Math.round((oldHueValue - 60) * 1 / 3);
+            }
+            else if (oldHueValue <= 180) {
+                return oldHueValue + Math.round((180 - oldHueValue) * 1 / 3);
+            }
+            else if (oldHueValue <= 240) {
+                return oldHueValue - Math.round((oldHueValue - 180) * 1 / 3);
+            }
+            else if (oldHueValue <= 300) {
+                return oldHueValue + Math.round((300 - oldHueValue) * 1 / 3);
+            }
+            else if (oldHueValue <= 360) {
+                return oldHueValue - Math.round((oldHueValue - 300) * 1 / 3);
+            }
+            else {
+                printError("Hue like CMY Error, oldHueValue : " + oldHueValue);
+                return 0;
+            }
+        };
+        const returnHueCloseToPrimaryRGB = (oldHueValue) => {
+            if (0 <= oldHueValue && oldHueValue <= 60) {
+                return oldHueValue - Math.round(oldHueValue * 1 / 3);
+            }
+            else if (oldHueValue <= 120) {
+                return oldHueValue + Math.round((120 - oldHueValue) * 1 / 3);
+            }
+            else if (oldHueValue <= 180) {
+                return oldHueValue - Math.round((oldHueValue - 120) * 1 / 3);
+            }
+            else if (oldHueValue <= 240) {
+                return oldHueValue + Math.round((240 - oldHueValue) * 1 / 3);
+            }
+            else if (oldHueValue <= 300) {
+                return oldHueValue - Math.round((oldHueValue - 240) * 1 / 3);
+            }
+            else if (oldHueValue <= 360) {
+                return oldHueValue + Math.round((360 - oldHueValue) * 1 / 3);
+            }
+            else {
+                printError("Hue like RGB Error, oldHueValue : " + oldHueValue);
+                return 0;
+            }
+        };
         const returnNewFrontColorAry = (oldRgbAry) => {
             const oldHslAry = rgbToHsl(oldRgbAry);
             const newHslAry = [].concat(oldHslAry);
             // change color
-            if (newHslAry[0] <= 360) { // Hueは360以下が正常
-                newHslAry[0] -= 15;
-                if (newHslAry[0] < 0) {
-                    newHslAry[0] += 360;
+            newHslAry[2] = newHslAry[2] < 50 ? newHslAry[2] : 100 - newHslAry[2];
+            if (!scriptOptionLightStyle) {
+                newHslAry[2] -= Math.round(newHslAry[2] * (255000 - (oldRgbAry[0] * 299 + oldRgbAry[1] * 587 + oldRgbAry[2] * 114)) / 510000);
+                newHslAry[0] = returnHueFarFromPrimaryRGB(newHslAry[0]);
+                newHslAry[2] = 100 - newHslAry[2]; // reverse lightness
+            }
+            else {
+                newHslAry[2] -= Math.round(newHslAry[2] * (oldRgbAry[0] * 299 + oldRgbAry[1] * 587 + oldRgbAry[2] * 114) / 510000);
+                if (scriptOptionColorFarFromPrimaryRGB) {
+                    newHslAry[0] = returnHueFarFromPrimaryRGB(newHslAry[0]);
+                }
+                else {
+                    newHslAry[0] = returnHueCloseToPrimaryRGB(newHslAry[0]);
                 }
             }
-            newHslAry[2] = newHslAry[2] < 50 ? newHslAry[2] : 100 - newHslAry[2];
-            if (newHslAry[1] === 0) {
-                newHslAry[2] = Math.round(10 * newHslAry[2] / 130);
-            }
-            else
-                newHslAry[2] = Math.round(newHslAry[1] * newHslAry[2] / 130);
-            if (!scriptOptionLightStyle)
-                newHslAry[2] = 100 - newHslAry[2];
             return hslToRgb(newHslAry);
         };
         const returnNewBgColorAry = (oldRgbAry) => {
             const oldHslAry = rgbToHsl(oldRgbAry);
             const newHslAry = [].concat(oldHslAry);
             // change color
-            if (newHslAry[0] <= 360) { // Hueは360以下が正常
-                newHslAry[0] -= 345;
-                if (newHslAry[0] < 0) {
-                    newHslAry[0] += 360;
+            newHslAry[2] = newHslAry[2] < 50 ? newHslAry[2] : 100 - newHslAry[2];
+            if (scriptOptionLightStyle) {
+                newHslAry[2] -= Math.round(newHslAry[2] * (255000 - (oldRgbAry[0] * 299 + oldRgbAry[1] * 587 + oldRgbAry[2] * 114)) / 255000);
+                newHslAry[0] = returnHueFarFromPrimaryRGB(newHslAry[0]);
+                newHslAry[2] = 100 - newHslAry[2]; // reverse lightness
+            }
+            else {
+                newHslAry[2] -= Math.round(newHslAry[2] * (oldRgbAry[0] * 299 + oldRgbAry[1] * 587 + oldRgbAry[2] * 114) / 255000);
+                if (scriptOptionColorFarFromPrimaryRGB) {
+                    newHslAry[0] = returnHueFarFromPrimaryRGB(newHslAry[0]);
+                }
+                else {
+                    newHslAry[0] = returnHueCloseToPrimaryRGB(newHslAry[0]);
                 }
             }
-            newHslAry[2] = newHslAry[2] < 50 ? newHslAry[2] : 100 - newHslAry[2];
-            if (newHslAry[1] === 0) {
-                newHslAry[2] = Math.round(10 * newHslAry[2] / 130);
-            }
-            else
-                newHslAry[2] = Math.round(newHslAry[1] * newHslAry[2] / 130);
-            if (scriptOptionLightStyle)
-                newHslAry[2] = 100 - newHslAry[2];
             return hslToRgb(newHslAry);
         };
         const returnNewFrontColorStr = (elmColor) => {
@@ -299,22 +365,20 @@ headの小要素を監視してスタイルの変化のみを検知するobserve
         };
         const returnNewVisitedColorStr = (elmColor) => {
             const tmpRgbArray = toAryForDecClr(elmColor);
-            const oldHslAry = rgbToHsl(tmpRgbArray);
-            const newHslAry = [].concat(oldHslAry);
-            // change color
-            if (newHslAry[0] <= 360) { // Hueは360以下が正常
-                newHslAry[0] -= 330;
-                if (newHslAry[0] < 0) {
-                    newHslAry[0] += 360;
+            const rgbAry = [].concat(tmpRgbArray);
+            const tmpColorBrightness = Math.round((tmpRgbArray[0] * 299 + tmpRgbArray[1] * 587 + tmpRgbArray[2] * 114) / 1000);
+            if (!scriptOptionLightStyle) {
+                for (let i = 0; i < 3; i++) {
+                    rgbAry[i] = Math.round(rgbAry[i] * 118 / tmpColorBrightness);
                 }
             }
-            if (newHslAry[2] < 50) {
-                newHslAry[2] = Math.round(100 - (100 - newHslAry[2]) * 7 / 8); // 明るさ
-            }
             else {
-                newHslAry[2] = Math.round(newHslAry[2] * 7 / 8); // 明るさ
+                for (let i = 0; i < 3; i++) {
+                    rgbAry[i] = 255 - rgbAry[i];
+                    rgbAry[i] = Math.round(rgbAry[i] * 118 / (255 - tmpColorBrightness));
+                    rgbAry[i] = 255 - rgbAry[i];
+                }
             }
-            const rgbAry = hslToRgb(newHslAry);
             if (tmpRgbArray.length === 4) {
                 return `rgba(${rgbAry[0]}, ${rgbAry[1]}, ${rgbAry[2]}, ${tmpRgbArray[3]})`;
             }
