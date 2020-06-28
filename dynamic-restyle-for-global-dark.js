@@ -4,7 +4,7 @@
 // @namespace      https://github.com/yzrsng/userscripts
 // @description    The website becomes dark.
 // @description:ja ウェブページを元のデザインに基づいて暗く装飾する
-// @version        0.20200628.1
+// @version        0.20200628.3
 // @author         yzrsng
 // @downloadURL    https://raw.githubusercontent.com/yzrsng/userscripts/master/dynamic-restyle-for-global-dark.js
 // @include        http://*
@@ -64,6 +64,7 @@ importantとそうでないのと(importantは対応しなくてもよい)
         const dataOriginBgimage = `data-${cssId}-origin-bgimage`;
         const dataOriginFilters = `data-${cssId}-origin-filters`;
         const dataOriginFilterColor = `data-${cssId}-origin-filter-color`;
+        const dataTwitterWidgetOverridden = `data-${cssId}-twitter-widget-overridden`;
         const cssVariableFcolor = `--${cssId}-fcolor`;
         const cssVariableFcolorVisited = `--${cssId}-fcolor-visited`;
         const cssVariableBgcolor = `--${cssId}-bgcolor`;
@@ -952,11 +953,9 @@ importantとそうでないのと(importantは対応しなくてもよい)
         const isInNode = (elm, rootElm = document) => {
             return (elm === rootElm) ? false : rootElm.contains(elm);
         };
-        const allElms = document.getElementsByTagName('*');
         const restyleElmsFromStyleAttribute = (argRecords = [{ target: document, type: "all" }]) => {
             const argRecordsLength = argRecords.length;
             const tmpTargetElms = [];
-            // const allElmsLength = allElms.length;
             let flagAlreadyRebuiltStyleSheets = false;
             set_targets: for (let k = 0; k < argRecordsLength; k++) {
                 const argRecordType = argRecords[k].type;
@@ -994,9 +993,11 @@ importantとそうでないのと(importantは対応しなくてもよい)
             }
         };
         const restyleElmsFromComputedStyle = (argRecords = [{ target: document, type: "all" }]) => {
+            const checkTargetTagName = (tmpTagName) => {
+                return /[a-z]/.test(tmpTagName) || tmpTagName === "TWITTER-WIDGET" || tmpTagName === "LINK" || tmpTagName === "META" || tmpTagName === "SCRIPT" || tmpTagName === "NOSCRIPT" || tmpTagName === "STYLE" || tmpTagName === "HEAD" || tmpTagName === "TITLE";
+            };
             const argRecordsLength = argRecords.length;
             const tmpTargetElms = [];
-            // const allElmsLength = allElms.length;
             let flagRestyleAll = false;
             set_targets: for (let k = 0; k < argRecordsLength; k++) {
                 const argRecordType = argRecords[k].type;
@@ -1011,6 +1012,24 @@ importantとそうでないのと(importantは対応しなくてもよい)
                 const argRecordTargetTagName = argRecordTarget.tagName;
                 const regex = /[a-z]/; // math要素対策
                 if (regex.test(argRecordTargetTagName)) {
+                    continue;
+                }
+                // Twitter Widget 20200628
+                if (!scriptOptionLightStyle && argRecordTargetTagName === "TWITTER-WIDGET") {
+                    if (!argRecordTarget.hasAttribute(dataTwitterWidgetOverridden)) {
+                        const twShadowRoot = argRecordTarget.shadowRoot;
+                        if (twShadowRoot && twShadowRoot.mode === "open") {
+                            argRecordTarget.setAttribute(dataTwitterWidgetOverridden, "");
+                            const simpleCss = document.createElement('style');
+                            simpleCss.type = "text/css";
+                            simpleCss.insertAdjacentHTML('beforeend', `
+* {
+    color: #dcd8d0 !important;
+    background-color: #000000 !important;
+}`);
+                            twShadowRoot.appendChild(simpleCss);
+                        }
+                    }
                     continue;
                 }
                 if (argRecordType === "characterData") {
@@ -1064,7 +1083,7 @@ importantとそうでないのと(importantは対応しなくてもよい)
             }
             let restyleTargetElms = tmpTargetElms;
             if (flagRestyleAll) {
-                restyleTargetElms = allElms;
+                restyleTargetElms = document.getElementsByTagName('*');
             }
             // else {
             //   restyleTargetElms = tmpTargetElms.filter((x, i, self) => self.indexOf(x) === i);
@@ -1079,7 +1098,7 @@ importantとそうでないのと(importantは対応しなくてもよい)
                 for (let j = 0; j < existStyleAryLength; j++) {
                     existStyleAry[i][j] = "";
                 }
-                if (restyleTargetTagName === "LINK" || restyleTargetTagName === "META" || restyleTargetTagName === "SCRIPT" || restyleTargetTagName === "NOSCRIPT" || restyleTargetTagName === "STYLE" || restyleTargetTagName === "HEAD" || restyleTargetTagName === "TITLE") {
+                if (checkTargetTagName(restyleTargetTagName)) {
                     continue;
                 }
                 existStyleAry[i][0] = restyleTargetTagName;
