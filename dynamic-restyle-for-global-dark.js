@@ -4,7 +4,7 @@
 // @namespace      https://github.com/yzrsng/userscripts
 // @description    The website becomes dark.
 // @description:ja ウェブページを元のデザインに基づいて暗く装飾する
-// @version        0.20200626.5
+// @version        0.20200628.1
 // @author         yzrsng
 // @downloadURL    https://raw.githubusercontent.com/yzrsng/userscripts/master/dynamic-restyle-for-global-dark.js
 // @include        http://*
@@ -964,12 +964,13 @@ importantとそうでないのと(importantは対応しなくてもよい)
                 if (!isInNode(argRecordTarget, document)) {
                     continue;
                 }
+                const argRecordTargetTagName = argRecordTarget.tagName;
                 const regex = /[a-z]/; // math要素対策
-                if (regex.test(argRecordTarget.tagName)) {
+                if (regex.test(argRecordTargetTagName)) {
                     continue;
                 }
                 if (argRecordType === "childList") {
-                    if (argRecordTarget.tagName === "HEAD") {
+                    if (argRecordTargetTagName === "HEAD") {
                         for (const addNode of argRecords[k].addedNodes) {
                             if (addNode.tagName === "STYLE" || addNode.tagName === "LINK" && addNode.rel.includes("stylesheet")) {
                                 buildOverrideStyleSheets();
@@ -1007,19 +1008,20 @@ importantとそうでないのと(importantは対応しなくてもよい)
                 if (!isInNode(argRecordTarget, document)) {
                     continue;
                 }
+                const argRecordTargetTagName = argRecordTarget.tagName;
                 const regex = /[a-z]/; // math要素対策
-                if (regex.test(argRecordTarget.tagName)) {
+                if (regex.test(argRecordTargetTagName)) {
                     continue;
                 }
                 if (argRecordType === "characterData") {
-                    if (argRecordTarget.tagName === "STYLE") {
+                    if (argRecordTargetTagName === "STYLE") {
                         buildOverrideStyleSheets();
                         flagRestyleAll = true;
                         break set_targets;
                     }
                 }
                 else if (argRecordType === "childList") {
-                    if (argRecordTarget.tagName === "HEAD") {
+                    if (argRecordTargetTagName === "HEAD") {
                         for (const addNode of argRecords[k].addedNodes) {
                             if (addNode.tagName === "STYLE" || addNode.tagName === "LINK" && addNode.rel.includes("stylesheet")) {
                                 buildOverrideStyleSheets();
@@ -1046,7 +1048,7 @@ importantとそうでないのと(importantは対応しなくてもよい)
                     }
                 }
                 else if (argRecordType === "attributes") {
-                    if (argRecordTarget.tagName === "HTML") {
+                    if (argRecordTargetTagName === "HTML") {
                         flagRestyleAll = true;
                         break set_targets;
                     }
