@@ -4,7 +4,7 @@
 // @namespace      https://github.com/yzrsng/userscripts
 // @description    The website becomes light.
 // @description:ja ウェブページを元のデザインに基づいて明るく装飾する
-// @version        0.20200628.3
+// @version        0.20200629.1
 // @author         yzrsng
 // @downloadURL    https://raw.githubusercontent.com/yzrsng/userscripts/master/dynamic-restyle-for-global-light.js
 // @include        http://*
@@ -15,7 +15,6 @@
 // @grant          none
 // ==/UserScript==
 /*
-明るさは鮮やかさに比例
 画像の上の文字が色の変更で判別できなくなると困るので縁取り文字に
 
 オプション
@@ -771,7 +770,7 @@ importantとそうでないのと(importantは対応しなくてもよい)
                     break;
                 }
                 posDecClrStart.push(posRgbTmp);
-                posDecClrEnd.push(tmpGradient.indexOf(")", posDecClrStart[i] + 11) + 1);
+                posDecClrEnd.push(tmpGradient.indexOf(")", posDecClrStart[i] + 9) + 1);
                 posRgbTmp = tmpGradient.indexOf("rgb", posDecClrEnd[i]);
                 if (i >= loopLimit) {
                     printError("Infinity Loop on analyze gradient.");
@@ -1264,6 +1263,7 @@ importantとそうでないのと(importantは対応しなくてもよい)
         const optionHeavy = {
             attributes: true,
             attributeFilter: ["class", "style"],
+            characterData: true,
             childList: true,
             subtree: true
         };
