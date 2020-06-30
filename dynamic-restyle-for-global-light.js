@@ -4,7 +4,7 @@
 // @namespace      https://github.com/yzrsng/userscripts
 // @description    The website becomes light.
 // @description:ja ウェブページを元のデザインに基づいて明るく装飾する
-// @version        0.20200629.1
+// @version        0.20200630.2
 // @author         yzrsng
 // @downloadURL    https://raw.githubusercontent.com/yzrsng/userscripts/master/dynamic-restyle-for-global-light.js
 // @include        http://*
@@ -39,17 +39,19 @@ importantとそうでないのと(importantは対応しなくてもよい)
     const scriptOptionColorFarFromPrimaryRGB = true; // for color blind users and others
     const scriptOptionImageFloat = false;
     const head = document.getElementsByTagName('head')[0];
-    const tmpCss = document.createElement('style');
-    tmpCss.type = "text/css";
-    tmpCss.insertAdjacentHTML('beforeend', scriptOptionLightStyle ? `
+    const simpleLightStyleString = `
 * {
     color: #141820 !important;
     background-color: #ffffff !important;
-}` : `
+}`;
+    const simpleDarkStyleString = `
 * {
     color: #dcd8d0 !important;
     background-color: #000000 !important;
-}`);
+}`;
+    const tmpCss = document.createElement('style');
+    tmpCss.type = "text/css";
+    tmpCss.insertAdjacentHTML('beforeend', scriptOptionLightStyle ? simpleLightStyleString : simpleDarkStyleString);
     head.appendChild(tmpCss);
     const initRestyle = () => {
         const scriptName = "gldrs";
@@ -72,12 +74,7 @@ importantとそうでないのと(importantは対応しなくてもよい)
         const cssVariableFilterColor = `--${cssId}-filter-color`;
         const cssRootBackgroundColor = scriptOptionLightStyle ? "#ffffff" : "#000000";
         const cssVariableTextShadow = cssRootBackgroundColor + "80";
-        const dynamicCss = document.createElement('style');
-        dynamicCss.type = "text/css";
-        dynamicCss.className = `${cssId} ${cssId}-restyle`;
-        dynamicCss.media = "screen";
-        if (!scriptOptionLightStyle) {
-            dynamicCss.insertAdjacentHTML('beforeend', `
+        const darkScrollStyleString = `
 * {
     scrollbar-color: #2a2c2e #1c1e1f;
 }
@@ -90,7 +87,13 @@ importantとそうでないのと(importantは対応しなくてもよい)
 }
 ::-webkit-scrollbar-thumb {
     background-color: #2a2c2e;
-}`);
+}`;
+        const dynamicCss = document.createElement('style');
+        dynamicCss.type = "text/css";
+        dynamicCss.className = `${cssId} ${cssId}-restyle`;
+        dynamicCss.media = "screen";
+        if (!scriptOptionLightStyle) {
+            dynamicCss.insertAdjacentHTML('beforeend', darkScrollStyleString);
         }
         dynamicCss.insertAdjacentHTML('beforeend', `
 :root {
@@ -993,7 +996,7 @@ importantとそうでないのと(importantは対応しなくてもよい)
         };
         const restyleElmsFromComputedStyle = (argRecords = [{ target: document, type: "all" }]) => {
             const checkTargetTagName = (tmpTagName) => {
-                return /[a-z]/.test(tmpTagName) || tmpTagName === "TWITTER-WIDGET" || tmpTagName === "LINK" || tmpTagName === "META" || tmpTagName === "SCRIPT" || tmpTagName === "NOSCRIPT" || tmpTagName === "STYLE" || tmpTagName === "HEAD" || tmpTagName === "TITLE";
+                return /[a-z]/.test(tmpTagName) || tmpTagName === "IFRAME" || tmpTagName === "TWITTER-WIDGET" || tmpTagName === "LINK" || tmpTagName === "META" || tmpTagName === "SCRIPT" || tmpTagName === "NOSCRIPT" || tmpTagName === "STYLE" || tmpTagName === "HEAD" || tmpTagName === "TITLE";
             };
             const argRecordsLength = argRecords.length;
             const tmpTargetElms = [];
@@ -1013,20 +1016,19 @@ importantとそうでないのと(importantは対応しなくてもよい)
                 if (regex.test(argRecordTargetTagName)) {
                     continue;
                 }
-                // Twitter Widget 20200628
-                if (!scriptOptionLightStyle && argRecordTargetTagName === "TWITTER-WIDGET") {
+                // Twitter Widget 20200630
+                if (!scriptOptionLightStyle && (argRecordTargetTagName === "TWITTER-WIDGET" || argRecordTargetTagName === "IFRAME" && argRecordTarget.classList.contains("twitter-timeline"))) {
                     if (!argRecordTarget.hasAttribute(dataTwitterWidgetOverridden)) {
                         const twShadowRoot = argRecordTarget.shadowRoot;
+                        const simpleCss = document.createElement('style');
+                        simpleCss.type = "text/css";
+                        simpleCss.insertAdjacentHTML('beforeend', simpleDarkStyleString + darkScrollStyleString);
                         if (twShadowRoot && twShadowRoot.mode === "open") {
                             argRecordTarget.setAttribute(dataTwitterWidgetOverridden, "");
-                            const simpleCss = document.createElement('style');
-                            simpleCss.type = "text/css";
-                            simpleCss.insertAdjacentHTML('beforeend', `
-* {
-    color: #dcd8d0 !important;
-    background-color: #000000 !important;
-}`);
                             twShadowRoot.appendChild(simpleCss);
+                        }
+                        else if (argRecordTarget.contentWindow) {
+                            argRecordTarget.contentWindow.document.head.appendChild(simpleCss);
                         }
                     }
                     continue;
