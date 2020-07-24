@@ -4,7 +4,7 @@
 // @namespace      https://github.com/yzrsng/userscripts
 // @description    The website becomes dark.
 // @description:ja ウェブページを元のデザインに基づいて暗く装飾する
-// @version        0.20200630.2
+// @version        0.20200702.1
 // @author         yzrsng
 // @downloadURL    https://raw.githubusercontent.com/yzrsng/userscripts/master/dynamic-restyle-for-global-dark.js
 // @include        http://*
@@ -118,9 +118,6 @@ importantとそうでないのと(importantは対応しなくてもよい)
     background-color: transparent !important;
     filter: var(${cssVariableOriginFilters}, invert(0)) drop-shadow(0px 0px 1px var(${cssVariableFilterColor}, #80808080)) !important;
 }`);
-        const printError = (messageStr = "somewhere") => {
-            console.error(scriptName + " ERROR: " + messageStr);
-        };
         const returnParentsBgColor = (elm) => {
             const parentElmStyle = window.getComputedStyle(elm.parentNode);
             const parentElmBgColor = parentElmStyle.getPropertyValue("background-color");
@@ -134,12 +131,12 @@ importantとそうでないのと(importantは対応しなくてもよい)
         };
         const rgbToHsl = (rgbAry) => {
             if (rgbAry.length > 4) {
-                printError("color array length is over 4");
+                console.error("color array length is over 4");
                 console.log(rgbAry);
                 return [362, 255, 255];
             }
             if (isNaN(rgbAry[0]) || isNaN(rgbAry[1]) || isNaN(rgbAry[2])) {
-                printError("NaN in RGB");
+                console.error("NaN in RGB");
                 console.log(rgbAry);
                 return [362, 255, 255];
             }
@@ -166,7 +163,7 @@ importantとそうでないのと(importantは対応しなくてもよい)
                     hslAry[0] = calcHuePart(rgbAry[0], rgbAry[1]) + 240;
                 }
                 else {
-                    printError("RGBからHSLへの変換のHの計算で意図しない動作");
+                    console.error("RGBからHSLへの変換のHの計算で意図しない動作");
                     console.log(rgbAry);
                     hslAry[0] = 362;
                 }
@@ -189,7 +186,7 @@ importantとそうでないのと(importantは対応しなくてもよい)
             }
             const calcRgbPart = (clr0) => Math.round(clr0 / 60 * (rgbMax - rgbMin) + rgbMin);
             if (hslAry[0] > 360) { // Hueは360以下が正常
-                printError("Hueが360より大きい");
+                console.error("Hueが360より大きい");
                 return rgbAry;
             }
             else if (0 <= hslAry[0] && hslAry[0] <= 60) {
@@ -223,7 +220,7 @@ importantとそうでないのと(importantは対応しなくてもよい)
                 rgbAry[2] = calcRgbPart(360 - hslAry[0]);
             }
             else {
-                printError("HSLからRGBへの変換で意図しない動作");
+                console.error("HSLからRGBへの変換で意図しない動作");
                 rgbAry[0] = rgbAry[1] = rgbAry[2] = 0;
             }
             rgbAry[0] = Math.round(rgbAry[0]);
@@ -243,13 +240,13 @@ importantとそうでないのと(importantは対応しなくてもよい)
             const clrValue = rgbColorStr.substring(rgbColorStr.indexOf("(", 3) + 1, rgbColorStr.length - 1).replace(/\s+/g, '');
             const clrArray = clrValue.split(/ *, */);
             if (clrArray.length < 3 || 4 < clrArray.length) {
-                printError("受け取った色の文字列がおかしい");
+                console.error("受け取った色の文字列がおかしい");
                 console.log(rgbColorStr);
             }
             // return clrArray;
             const numAry = toNumForDecClr(clrArray);
             if (isNaN(numAry[0]) || isNaN(numAry[1]) || isNaN(numAry[2])) {
-                printError("受け取った色の文字列がおかしい");
+                console.error("受け取った色の文字列がおかしい");
                 console.log(rgbColorStr);
             }
             return numAry;
@@ -288,7 +285,7 @@ importantとそうでないのと(importantは対応しなくてもよい)
                 return oldHueValue - Math.round((oldHueValue - 300) * 1 / 3);
             }
             else {
-                printError("Hue like CMY Error, oldHueValue : " + oldHueValue);
+                console.error("Hue like CMY Error, oldHueValue : " + oldHueValue);
                 return 0;
             }
         };
@@ -312,7 +309,7 @@ importantとそうでないのと(importantは対応しなくてもよい)
                 return oldHueValue + Math.round((360 - oldHueValue) * 1 / 3);
             }
             else {
-                printError("Hue like RGB Error, oldHueValue : " + oldHueValue);
+                console.error("Hue like RGB Error, oldHueValue : " + oldHueValue);
                 return 0;
             }
         };
@@ -776,7 +773,7 @@ importantとそうでないのと(importantは対応しなくてもよい)
                 posDecClrEnd.push(tmpGradient.indexOf(")", posDecClrStart[i] + 9) + 1);
                 posRgbTmp = tmpGradient.indexOf("rgb", posDecClrEnd[i]);
                 if (i >= loopLimit) {
-                    printError("Infinity Loop on analyze gradient.");
+                    console.error("Infinity Loop on analyze gradient.");
                     break;
                 }
             }
@@ -882,7 +879,7 @@ importantとそうでないのと(importantは対応しなくてもよい)
                     // console.log(rootStyleSheet.cssRules);
                 }
                 catch (e) {
-                    printError(`クロスドメインリソースはよめません\n${e}`);
+                    console.debug(`クロスドメインリソースはよめません\n${e}`);
                     return null;
                 }
             }
@@ -914,12 +911,12 @@ importantとそうでないのと(importantは対応しなくてもよい)
                     overrideStyleText += `@keyframe ${SingleCSSRule.name}{${createOverrideStyleSheetText(SingleCSSRule.cssRules)}}`;
                 }
                 else if (SingleCSSRule.type === CSSRule.KEYFRAME_RULE && SingleCSSRule instanceof CSSKeyframeRule) {
-                    printError("KEYFRAME_RULE 実装思案中");
+                    console.debug("KEYFRAME_RULE 実装思案中");
                     // console.log(SingleCSSRule);
                     // overrideStyleText += `${SingleCSSRule.keyText}{}`;
                 }
                 else if (SingleCSSRule.type === CSSRule.SUPPORTS_RULE && SingleCSSRule instanceof CSSSupportsRule) {
-                    printError("SUPPORTS_RULE 実装思案中");
+                    console.debug("SUPPORTS_RULE 実装思案中");
                     // console.log(SingleCSSRule);
                 }
             }
@@ -1281,7 +1278,7 @@ importantとそうでないのと(importantは対応しなくてもよい)
             if (restyleRecords.length > 0 && isRunning === false) {
                 if (addedWorkCount > ADDED_WORK_COUNT_LIMIT || continuousWorkCount > CONTINUOUS_WORK_COUNT_LIMIT) {
                     needRework = false;
-                    printError("observer thrown out work.\nbecause this web page changes frequently.");
+                    console.error("observer thrown out work.\nbecause this web page changes frequently.");
                     // window.alert("Observer for restyle is going to stop.\nBecause this web page changes frequently.\n\nページの変更が激しいので\n電力消費を抑えるために変更の検知を停止します。");
                 }
                 addedWorkCount++;
