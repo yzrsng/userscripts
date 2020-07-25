@@ -4,7 +4,7 @@
 // @namespace      https://github.com/yzrsng/userscripts
 // @description    The website becomes dark.
 // @description:ja ウェブページを元のデザインに基づいて暗く装飾する
-// @version        0.20200724.1
+// @version        0.20200724.2
 // @author         yzrsng
 // @downloadURL    https://raw.githubusercontent.com/yzrsng/userscripts/master/dynamic-restyle-for-global-dark.js
 // @include        http://*
@@ -317,15 +317,10 @@ importantとそうでないのと(importantは対応しなくてもよい)
             const oldHslAry = rgbToHsl(oldRgbAry);
             const newHslAry = [].concat(oldHslAry);
             // change color
-            newHslAry[2] = newHslAry[2] < 50 ? newHslAry[2] : 100 - newHslAry[2];
-            const newRGBAry = hslToRgb(newHslAry);
-            if (!scriptOptionLightStyle) {
-                newHslAry[2] -= Math.round(newHslAry[2] * (255000 - (newRGBAry[0] * 299 + newRGBAry[1] * 587 + newRGBAry[2] * 114)) / 510000);
-                newHslAry[0] = returnHueFarFromPrimaryRGB(newHslAry[0]);
-                newHslAry[2] = 100 - newHslAry[2]; // reverse lightness
-            }
-            else {
-                newHslAry[2] -= Math.round(newHslAry[2] * (newRGBAry[0] * 299 + newRGBAry[1] * 587 + newRGBAry[2] * 114) / 510000);
+            newHslAry[2] = newHslAry[2] <= 50 ? newHslAry[2] : 100 - newHslAry[2];
+            const newRgbAry = hslToRgb(newHslAry);
+            if (scriptOptionLightStyle) {
+                newHslAry[2] -= Math.round(newHslAry[2] * (newRgbAry[0] * 299 + newRgbAry[1] * 587 + newRgbAry[2] * 114) / 510000);
                 if (scriptOptionColorFarFromPrimaryRGB) {
                     newHslAry[0] = returnHueFarFromPrimaryRGB(newHslAry[0]);
                 }
@@ -333,21 +328,26 @@ importantとそうでないのと(importantは対応しなくてもよい)
                     newHslAry[0] = returnHueCloseToPrimaryRGB(newHslAry[0]);
                 }
             }
+            else {
+                newHslAry[2] -= Math.round(newHslAry[2] * (255000 - (newRgbAry[0] * 299 + newRgbAry[1] * 587 + newRgbAry[2] * 114)) / 510000);
+                newHslAry[0] = returnHueFarFromPrimaryRGB(newHslAry[0]);
+                newHslAry[2] = 100 - newHslAry[2]; // reverse lightness
+            }
             return hslToRgb(newHslAry);
         };
         const returnNewBgColorAry = (oldRgbAry) => {
             const oldHslAry = rgbToHsl(oldRgbAry);
             const newHslAry = [].concat(oldHslAry);
             // change color
-            newHslAry[2] = newHslAry[2] < 50 ? newHslAry[2] : 100 - newHslAry[2];
-            const newRGBAry = hslToRgb(newHslAry);
+            newHslAry[2] = newHslAry[2] <= 50 ? newHslAry[2] : 100 - newHslAry[2];
+            const newRgbAry = hslToRgb(newHslAry);
             if (scriptOptionLightStyle) {
-                newHslAry[2] -= Math.round(newHslAry[2] * (255000 - (newRGBAry[0] * 299 + newRGBAry[1] * 587 + newRGBAry[2] * 114)) / 255000);
+                newHslAry[2] -= Math.round(newHslAry[2] * (255000 - (newRgbAry[0] * 299 + newRgbAry[1] * 587 + newRgbAry[2] * 114)) / 255000);
                 newHslAry[0] = returnHueFarFromPrimaryRGB(newHslAry[0]);
                 newHslAry[2] = 100 - newHslAry[2]; // reverse lightness
             }
             else {
-                newHslAry[2] -= Math.round(newHslAry[2] * (newRGBAry[0] * 299 + newRGBAry[1] * 587 + newRGBAry[2] * 114) / 255000);
+                newHslAry[2] -= Math.round(newHslAry[2] * (newRgbAry[0] * 299 + newRgbAry[1] * 587 + newRgbAry[2] * 114) / 255000);
                 if (scriptOptionColorFarFromPrimaryRGB) {
                     newHslAry[0] = returnHueFarFromPrimaryRGB(newHslAry[0]);
                 }
