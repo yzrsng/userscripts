@@ -1,9 +1,11 @@
 // ==UserScript==
 // @name use Local Noto Serif CJK JP
+// @name:ja ローカルの Noto Serif CJK JP を使う
 // @namespace https://github.com/yzrsng/userscripts
 // @author yzrsng
-// @description Userscript to use Local JP Serif font on all websites in Android browser for Android 9 over (maybe).
-// @version 0.1.20210206.1
+// @description Userscript to use Local JP Serif font on all websites in Android browser for Android 9 over.
+// @description:ja ブラウザでローカルの日本語明朝体フォントを使うユーザースクリプト。Android 9 以降対象。
+// @version 0.1.20210206.2
 // @include http://*
 // @include https://*
 // @match *://*
