@@ -3,9 +3,10 @@
 // @namespace https://github.com/yzrsng/userscripts
 // @author yzrsng
 // @description Userscript to use Local JP Serif font on all websites in Android browser for Android 9 over (maybe).
-// @version 0.1.20210205.1
+// @version 0.1.20210206.1
 // @include http://*
 // @include https://*
+// @match *://*
 // @grant none
 // ==/UserScript==
 
